@@ -23,30 +23,30 @@ import java.util.Objects;
  This is NOT a type-safe null.
  @param <T>
  */
-public interface Option<T> { // extends UnmodSortedIterable<T> {
+public abstract class Option<T> { // extends UnmodSortedIterable<T> {
 
     /** Return the value wrapped in this Option.  Only safe to call this on Some. */
-    T get();
+    public abstract T get();
 
     /** If this is Some, return the value wrapped in this Option.  Otherwise, return the given value. */
-    T getOrElse(T t);
+    public abstract T getOrElse(T t);
 
     /** Is this Some? */
-    boolean isSome();
+    public abstract boolean isSome();
 
     /** Pass in a function to execute if its Some and another to execute if its None. */
-    <U> U patMat(Function1<T,U> has, Function0<U> hasNot);
+    public abstract <U> U patMat(Function1<T,U> has, Function0<U> hasNot);
 
     // ==================================================== Static ====================================================
     /** None is a singleton and this is its only instance. */
-    Option NONE = new None();
+    static final Option NONE = new None();
 
     /** Calling this instead of referring to NONE directly can make the type infrencer happy. */
     @SuppressWarnings("unchecked")
-    static <T> Option<T> none() { return NONE; }
+    public static <T> Option<T> none() { return NONE; }
 
     /** Public static factory method for contructing Options. */
-    static <T> Option<T> of(T t) {
+    public static <T> Option<T> of(T t) {
         if (NONE.equals(t)) {
             return none();
         }
@@ -62,7 +62,7 @@ public interface Option<T> { // extends UnmodSortedIterable<T> {
     }
 
     /** Represents the absence of a value */
-    final class None<T> implements Option<T> {
+    private static final class None<T> extends Option<T> {
         /** Private constructor for singleton. */
         private None() {}
 
@@ -76,7 +76,7 @@ public interface Option<T> { // extends UnmodSortedIterable<T> {
 //            return UnmodSortedIterator.empty();
 //        }
 
-        @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) { return hasNot.get(); }
+        @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) { return hasNot.call(); }
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */
         @Deprecated // Has no effect.  Darn!
@@ -92,7 +92,7 @@ public interface Option<T> { // extends UnmodSortedIterable<T> {
     }
 
     /** Represents the presence of a value, even if that value is null. */
-    class Some<T> implements Option<T> {
+    private static class Some<T> extends Option<T> {
         private final T item;
         private Some(T t) { item = t; }
 
@@ -119,7 +119,7 @@ public interface Option<T> { // extends UnmodSortedIterable<T> {
 //        }
 
         @Override public <U> U patMat(Function1<T,U> has, Function0<U> hasNot) {
-            return has.apply(item);
+            return has.call(item);
         }
 
         /** Valid, but deprecated because it's usually an error to call this in client code. */

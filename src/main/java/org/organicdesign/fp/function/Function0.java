@@ -22,7 +22,7 @@ import rx.functions.Func0;
  */
 public abstract class Function0<U> implements Func0<U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    abstract U applyEx() throws Exception;
+    public abstract U applyEx() throws Exception;
 
     /**
      The class that takes a consumer as an argument uses this convenience method so that it

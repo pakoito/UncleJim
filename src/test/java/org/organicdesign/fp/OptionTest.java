@@ -1,6 +1,8 @@
 package org.organicdesign.fp;
 
 import org.junit.Test;
+import org.organicdesign.fp.function.Function0;
+import org.organicdesign.fp.function.Function1;
 
 import static org.junit.Assert.*;
 import static org.organicdesign.testUtils.EqualsContract.equalsDistinctHashCode;
@@ -12,38 +14,56 @@ public class OptionTest {
         assertTrue(o1a.isSome());
         assertEquals(Integer.valueOf(1), o1a.get());
         assertEquals(Integer.valueOf(1), o1a.getOrElse(2));
-        assertEquals("One", o1a.patMat(s -> "One",
-                                       () -> "Two"));
+        assertEquals("One", o1a.patMat(OptionTest.<Integer, String>toValue1("One"),
+                                       OptionTest.toValue0("Two")));
 
         Option<Integer> z = Option.of(null);
         assertTrue(z.isSome());
         assertEquals(null, z.get());
         assertEquals(null, z.getOrElse(2));
-        assertEquals("One", z.patMat(s -> "One",
-                                     () -> "Two"));
+        assertEquals("One", z.patMat(OptionTest.<Integer, String>toValue1("One"),
+                                     OptionTest.toValue0("Two")));
 
         Option<Integer> n = Option.none();
         assertFalse(n.isSome());
         assertEquals(Integer.valueOf(2), n.getOrElse(2));
-        assertEquals("Two", n.patMat(s -> "One",
-                                     () -> "Two"));
+        assertEquals("Two", n.patMat(OptionTest.<Integer, String>toValue1("One"),
+                                     OptionTest.toValue0("Two")));
 
         Option<Integer> y = Option.someOrNullNoneOf(null);
         assertFalse(y.isSome());
         assertEquals(Integer.valueOf(2), y.getOrElse(2));
-        assertEquals("Two", y.patMat(s -> "One",
-                                     () -> "Two"));
+        assertEquals("Two", y.patMat(OptionTest.<Integer, String>toValue1("One"),
+                                     OptionTest.toValue0("Two")));
 
         Option<String> os = Option.someOrNullNoneOf("Hello");
         assertTrue(os.isSome());
         assertEquals("Hello", os.get());
         assertEquals("Hello", os.getOrElse("Goodbye"));
-        assertEquals(Integer.valueOf(1), o1a.patMat(s -> 1,
-                                                    () -> 2));
+        assertEquals(Integer.valueOf(1), o1a.patMat(OptionTest.<Integer, Integer>toValue1(1),
+                                                    OptionTest.toValue0(2)));
         assertEquals(Option.NONE, Option.someOrNullNoneOf(Option.NONE));
 
         assertTrue(Option.NONE.equals(Option.NONE));
         assertTrue(Option.NONE.equals(Option.someOrNullNoneOf(null)));
+    }
+
+    private static <R> Function0<R> toValue0(final R value) {
+        return new Function0<R>() {
+            @Override
+            public R applyEx() throws Exception {
+                return value;
+            }
+        };
+    }
+
+    private static <T, R> Function1<T, R> toValue1(final R value) {
+        return new Function1<T, R>() {
+            @Override
+            public R applyEx(T o) throws Exception {
+                return value;
+            }
+        };
     }
 
     @Test(expected = IllegalStateException.class) public void noneEx() {
