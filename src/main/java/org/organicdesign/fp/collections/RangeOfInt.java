@@ -56,8 +56,8 @@ public class RangeOfInt implements UnmodList<Integer> {
                 return o1.equals(o2);
             }
             return o1.size() == o2.size() &&
-                   UnmodSortedIterable.Helpers.equals2(Helpers.castFromList(o1),
-                                              Helpers.castFromList(o2));
+                   UnmodSortedIterable.Helpers.equals2(UnmodSortedIterable.Helpers.castFromList(o1),
+                                                       UnmodSortedIterable.Helpers.castFromList(o2));
         }
     };
 
