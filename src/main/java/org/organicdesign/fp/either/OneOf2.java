@@ -123,9 +123,9 @@ public class OneOf2<A,B> {
     public <R> R typeMatch(Function1<A, R> fa,
                            Function1<B, R> fb) {
         if (sel == 1) {
-            return fa.apply((A) item);
+            return fa.call((A) item);
         }
-        return fb.apply((B) item);
+        return fb.call((B) item);
     }
 
     // The A parameter ensures that this is used in the proper branch of the guard
@@ -156,10 +156,29 @@ public class OneOf2<A,B> {
         OneOf2 that = (OneOf2) other;
 
         if (sel == 1) {
-            return (boolean) that.typeMatch(thatItem -> Objects.equals(item, thatItem),
-                                            x -> false);
+            return (boolean) that.typeMatch(new Function1<Object, Boolean>() {
+                                                @Override
+                                                public Boolean applyEx(Object thatItem) throws Exception {
+                                                    return Objects.equals(item, thatItem);
+                                                }
+                                            },
+                                            toFalse());
         }
-        return (boolean) that.typeMatch(x -> false,
-                                        thatItem -> Objects.equals(item, thatItem));
+        return (boolean) that.typeMatch(toFalse(),
+                                        new Function1<Object, Boolean>() {
+                                            @Override
+                                            public Boolean applyEx(Object thatItem) throws Exception {
+                                                return Objects.equals(item, thatItem);
+                                            }
+                                        });
+    }
+
+    private Function1<Object, Boolean> toFalse() {
+        return new Function1<Object, Boolean>() {
+            @Override
+            public Boolean applyEx(Object o) throws Exception {
+                return false;
+            }
+        };
     }
 }
