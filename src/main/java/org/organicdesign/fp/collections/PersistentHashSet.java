@@ -14,6 +14,8 @@
 package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.collections.interfaces.UnmodIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodMap;
+import org.organicdesign.fp.function.Function1;
 
 import java.util.Set;
 
@@ -34,7 +36,7 @@ public class PersistentHashSet<E> extends ImSet<E> {
     public static <E> PersistentHashSet<E> empty() { return (PersistentHashSet<E>) EMPTY; }
 
     public static <E> PersistentHashSet<E> empty(Equator<E> eq) {
-        return new PersistentHashSet<>(PersistentHashMap.empty(eq));
+        return new PersistentHashSet<>(PersistentHashMap.<E, E>empty(eq));
     }
 
     /**
@@ -112,7 +114,14 @@ public class PersistentHashSet<E> extends ImSet<E> {
 
 //    @Override public Sequence<E> seq() { return impl.seq().map(e -> e.getKey()); }
 
-    @Override public UnmodIterator<E> iterator() { return impl.map(e -> e.getKey()).iterator(); }
+    @Override public UnmodIterator<E> iterator() {
+        return impl.map(new Function1<UnmodMap.UnEntry<E, E>, E>() {
+            @Override
+            public E applyEx(UnmodMap.UnEntry<E, E> eeUnEntry) throws Exception {
+                return eeUnEntry.getKey();
+            }
+        }).iterator();
+    }
 
     @Override public int size() { return impl.size(); }
 
@@ -138,8 +147,14 @@ public class PersistentHashSet<E> extends ImSet<E> {
 //        @Deprecated
 //        @Override public Sequence<E> seq() { return impl.keySet().seq(); }
 
-        @Override
-        public UnmodIterator<E> iterator() { return impl.map(e -> e.getKey()).iterator(); }
+        @Override public UnmodIterator<E> iterator() {
+            return impl.map(new Function1<UnmodMap.UnEntry<E, E>, E>() {
+                @Override
+                public E applyEx(UnmodMap.UnEntry<E, E> eeUnEntry) throws Exception {
+                    return eeUnEntry.getKey();
+                }
+            }).iterator();
+        }
 
         @SuppressWarnings("unchecked")
         @Override public boolean contains(Object key) {
