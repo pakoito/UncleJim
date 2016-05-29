@@ -13,28 +13,26 @@
 // limitations under the License.
 package org.organicdesign.fp.function;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.tuple.Tuple2;
+import rx.functions.Func2;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  This is like Java 8's java.util.function.BiFunction, but retrofitted to turn checked exceptions
  into unchecked ones.
  */
-@FunctionalInterface
-public interface Function2<A,B,R> extends BiFunction<A,B,R> {
+public abstract class Function2<A,B,R> implements Func2<A,B,R> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    R applyEx(A a, B b) throws Exception;
+    public abstract R applyEx(A a, B b) throws Exception;
 
     /**
      The class that takes a consumer as an argument uses this convenience method so that it
      doesn't have to worry about checked exceptions either.
      */
-    @Override default R apply(A a, B b) {
+    @Override public final R call(A a, B b) {
         try {
             return applyEx(a, b);
         } catch (RuntimeException re) {
@@ -56,7 +54,7 @@ public interface Function2<A,B,R> extends BiFunction<A,B,R> {
      very quickly.  Please note that the parameters to f need to implement equals() and hashCode() correctly
      for this to work correctly and quickly.
      */
-    static <A,B,Z> Function2<A,B,Z> memoize(Function2<A,B,Z> f) {
+    public static <A,B,Z> Function2<A,B,Z> memoize(final Function2<A,B,Z> f) {
         return new Function2<A,B,Z>() {
             private final Map<Tuple2<A,B>,Option<Z>> map = new HashMap<>();
             @Override
@@ -64,7 +62,7 @@ public interface Function2<A,B,R> extends BiFunction<A,B,R> {
                 Tuple2<A,B> t = Tuple2.of(a, b);
                 Option<Z> val = map.get(t);
                 if (val != null) { return val.get(); }
-                Z ret = f.apply(a, b);
+                Z ret = f.call(a, b);
                 map.put(t, Option.of(ret));
                 return ret;
             }

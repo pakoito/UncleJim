@@ -18,18 +18,18 @@ import java.util.Map;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.tuple.Tuple3;
+import rx.functions.Func3;
 
 /** A three-argument, exception-safe functional interface. */
-@FunctionalInterface
-public interface Function3<A,B,C,R> {
+public abstract class Function3<A,B,C,R> implements Func3<A, B, C, R> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    R applyEx(A a, B b, C c) throws Exception;
+    public abstract R applyEx(A a, B b, C c) throws Exception;
 
     /**
      The class that takes a consumer as an argument uses this convenience method so that it
      doesn't have to worry about checked exceptions either.
      */
-    default R apply(A a, B b, C c) {
+    private R apply(A a, B b, C c) {
         try {
             return applyEx(a, b, c);
         } catch (RuntimeException re) {
@@ -39,6 +39,11 @@ public interface Function3<A,B,C,R> {
         }
     }
 
+    @Override
+    public final R call(A a, B b, C c) {
+        return apply(a, b, c);
+    }
+
     /**
      Use only on pure functions with no side effects.  Wrap an expensive function with this and for each input
      value, the output will only be computed once.  Subsequent calls with the same input will return identical output
@@ -46,7 +51,7 @@ public interface Function3<A,B,C,R> {
      for this to work correctly and quickly.  Also, make sure your domain is very small!  This function uses O(n^3)
      memory.
      */
-    static <A,B,C,Z> Function3<A,B,C,Z> memoize(Function3<A,B,C,Z> f) {
+    static <A,B,C,Z> Function3<A,B,C,Z> memoize(final Function3<A,B,C,Z> f) {
         return new Function3<A,B,C,Z>() {
             private final Map<Tuple3<A,B,C>,Option<Z>> map = new HashMap<>();
             @Override

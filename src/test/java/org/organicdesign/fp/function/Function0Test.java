@@ -18,7 +18,7 @@ public class Function0Test {
             @Override public Integer applyEx() throws Exception {
                 throw new IOException("test exception");
             }
-        }.apply();
+        }.call();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -27,17 +27,17 @@ public class Function0Test {
             @Override public Integer applyEx() throws Exception {
                 throw new IllegalStateException("test exception");
             }
-        }.apply();
+        }.call();
     }
 
     @Test public void constantFunction() throws Exception {
         Function0<Integer> f = Function0.constantFunction(7);
-        assertEquals(Integer.valueOf(7), f.apply());
-        assertEquals(Integer.valueOf(7), f.applyEx());
-        assertEquals(Integer.valueOf(7), f.get());
         assertEquals(Integer.valueOf(7), f.call());
-        assertEquals(f.hashCode(), Function0.constantFunction(Integer.valueOf(7)).hashCode());
-        assertTrue(f.equals(Function0.constantFunction(Integer.valueOf(7))));
+        assertEquals(Integer.valueOf(7), f.applyEx());
+        assertEquals(Integer.valueOf(7), f.call());
+        assertEquals(Integer.valueOf(7), f.call());
+        assertEquals(f.hashCode(), Function0.constantFunction(7).hashCode());
+        assertTrue(f.equals(Function0.constantFunction(7)));
 
         assertEquals("() -> 7", f.toString());
 
@@ -50,7 +50,12 @@ public class Function0Test {
 
         assertNotEquals(Function0.constantFunction(null), null);
 
-        assertFalse(Function0.constantFunction(35).equals((Callable<Integer>) () -> 35));
+        assertFalse(Function0.constantFunction(35).equals(new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return 35;
+            }
+        }));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -64,6 +69,6 @@ public class Function0Test {
     }
 
     @Test public void testNull() {
-        assertNull(Function0.NULL.apply());
+        assertNull(Function0.NULL.call());
     }
 }

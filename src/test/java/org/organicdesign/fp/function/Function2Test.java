@@ -20,7 +20,7 @@ public class Function2Test {
                 }
                 return a;
             }
-        }.apply(1, 2);
+        }.call(1, 2);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -32,34 +32,37 @@ public class Function2Test {
                 }
                 return a;
             }
-        }.apply(3, 4);
+        }.call(3, 4);
     }
 
     @Test public void memoize() {
-        AtomicInteger counter = new AtomicInteger(0);
-        Function2<Integer,Double,String> f = (l, d) -> {
-            counter.getAndIncrement();
-            return String.valueOf(l) + "~" + String.valueOf(d);
+        final AtomicInteger counter = new AtomicInteger(0);
+        Function2<Integer,Double,String> f = new Function2<Integer, Double, String>() {
+            @Override
+            public String applyEx(Integer l, Double d) throws Exception {
+                counter.getAndIncrement();
+                return String.valueOf(l) + "~" + String.valueOf(d);
+            }
         };
         Function2<Integer,Double,String> g = Function2.memoize(f);
-        assertEquals("3~2.5", g.apply(3, 2.5));
+        assertEquals("3~2.5", g.call(3, 2.5));
         assertEquals(1, counter.get());
-        assertEquals("3~2.5", g.apply(3, 2.5));
+        assertEquals("3~2.5", g.call(3, 2.5));
         assertEquals(1, counter.get());
 
-        assertEquals("3~2.5", f.apply(3, 2.5));
+        assertEquals("3~2.5", f.call(3, 2.5));
         assertEquals(2, counter.get());
 
-        assertEquals("3~2.5", g.apply(3, 2.5));
+        assertEquals("3~2.5", g.call(3, 2.5));
         assertEquals(2, counter.get());
 
-        assertEquals("5~4.3", g.apply(5, 4.3));
+        assertEquals("5~4.3", g.call(5, 4.3));
         assertEquals(3, counter.get());
-        assertEquals("3~2.5", g.apply(3, 2.5));
+        assertEquals("3~2.5", g.call(3, 2.5));
         assertEquals(3, counter.get());
-        assertEquals("5~4.3", g.apply(5, 4.3));
+        assertEquals("5~4.3", g.call(5, 4.3));
         assertEquals(3, counter.get());
-        assertEquals("3~2.5", g.apply(3, 2.5));
+        assertEquals("3~2.5", g.call(3, 2.5));
         assertEquals(3, counter.get());
     }
 }

@@ -18,22 +18,20 @@ import org.organicdesign.fp.Option;
 import org.organicdesign.fp.collections.UnmodIterable;
 import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;
+import rx.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  This is like Java 8's java.util.function.Function, but retrofitted to turn checked exceptions
  into unchecked ones.
  */
-@FunctionalInterface
-public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
+public abstract class Function1<T,U> implements Func1<T,U> {
     // ========================================== Static ==========================================
-    Function1<Object,Object> IDENTITY = new Function1<Object,Object>() {
+    static final Function1<Object,Object> IDENTITY = new Function1<Object,Object>() {
 
         @Override
         public Object applyEx(Object t) throws Exception {
@@ -50,47 +48,72 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     };
 
     @SuppressWarnings("unchecked")
-    static <V> Function1<V,V> identity() { return (Function1<V,V>) IDENTITY; }
+    public static <V> Function1<V,V> identity() { return (Function1<V,V>) IDENTITY; }
 
-    static <S> Function1<S,Boolean> or(Function1<S,Boolean> a, Function1<S,Boolean> b) {
+    public static <S> Function1<S,Boolean> or(final Function1<S,Boolean> a, final Function1<S,Boolean> b) {
         return  a == ACCEPT ? a : // If any are true, all are true.  No composition necessary.
                 a == REJECT ? b : // return whatever b is.
                 b == ACCEPT ? b : // If any are true, all are true.
                 b == REJECT ? a : // Just amounts to if a else false, no composition necessary.
-                (S s) -> (a.apply(s) == Boolean.TRUE) || (b.apply(s) == Boolean.TRUE); // compose
+                        new Function1<S, Boolean>() {
+                            @Override
+                            public Boolean applyEx(S s) throws Exception {
+                                return (a.apply(s) == Boolean.TRUE) || (b.apply(s) == Boolean.TRUE);
+                            }
+                        }; // compose
     }
 
-    static <S> Function1<S,Boolean> and(Function1<S,Boolean> a, Function1<S,Boolean> b) {
+    public static <S> Function1<S,Boolean> and(final Function1<S,Boolean> a, final Function1<S,Boolean> b) {
         return  a == ACCEPT ? b : // return whatever b is.
                 a == REJECT ? a : // if any are false, all are false.  No composition necessary.
                 b == ACCEPT ? a : // Just amounts to if a else false, no composition necessary.
                 b == REJECT ? b : // If any are false, all are false.
-                (S s) -> (a.apply(s) == Boolean.TRUE) && (b.apply(s) == Boolean.TRUE); // compose
+                        new Function1<S, Boolean>() {
+                            @Override
+                            public Boolean applyEx(S s) throws Exception {
+                                return (a.apply(s) == Boolean.TRUE) && (b.apply(s) == Boolean.TRUE);
+                            }
+                        }; // compose
     }
 
-    static <S> Function1<S,Boolean> negate(Function1<? super S,Boolean> a) {
-        return  a == ACCEPT ? reject() :
-                a == REJECT ? accept() :
-                        (S s) -> (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
+    public static <S> Function1<S,Boolean> negate(final Function1<? super S,Boolean> a) {
+        return  a == ACCEPT ? Function1.<S>reject() :
+                a == REJECT ? Function1.<S>accept() :
+                        new Function1<S, Boolean>() {
+                            @Override
+                            public Boolean applyEx(S s) throws Exception {
+                                return (a.apply(s) == Boolean.TRUE) ? Boolean.FALSE : Boolean.TRUE;
+                            }
+                        };
     }
 
     /**
      A predicate that always returns true.  Use accept() for a type-safe version of this predicate.
      */
-    Function1<Object,Boolean> ACCEPT = t -> Boolean.TRUE;
+    static final Function1<Object,Boolean> ACCEPT = new Function1<Object, Boolean>() {
+        @Override
+        public Boolean applyEx(Object o) throws Exception {
+            return Boolean.TRUE;
+        }
+    };
 
     /**
      A predicate that always returns false. Use reject() for a type-safe version of this predicate.
      */
-    Function1<Object,Boolean> REJECT = t -> Boolean.FALSE;
+    static final Function1<Object,Boolean> REJECT = new Function1<Object, Boolean>() {
+        @Override
+        public Boolean applyEx(Object o) throws Exception {
+            return Boolean.FALSE;
+        }
+    };
 
     /** Returns a type-safe version of the ACCEPT predicate. */
     @SuppressWarnings("unchecked")
-    static <T> Function1<T,Boolean> accept() { return (Function1<T,Boolean>) ACCEPT; }
+    public static <T> Function1<T,Boolean> accept() { return (Function1<T,Boolean>) ACCEPT; }
 
     /** Returns a type-safe version of the REJECT predicate. */
     @SuppressWarnings("unchecked")
-    static <T> Function1<T,Boolean> reject() { return (Function1<T,Boolean>) REJECT; }
+    public static <T> Function1<T,Boolean> reject() { return (Function1<T,Boolean>) REJECT; }
 
 
     /**
@@ -133,7 +156,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
 
      @return a function which applies all the given functions in order.
      */
-    static <V> Function1<V,V> compose(Iterable<Function1<V,V>> in) {
+    public static <V> Function1<V,V> compose(Iterable<Function1<V,V>> in) {
         if (in == null) {
             return identity();
         }
@@ -149,12 +172,15 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
         } else if (out.size() == 1) {
             return out.get(0);
         } else {
-            return v -> {
-                V ret = v;
-                for (Function1<V,V> f : out) {
-                    ret = f.applyEx(ret);
+            return new Function1<V, V>() {
+                @Override
+                public V applyEx(V v) throws Exception {
+                    V ret = v;
+                    for (Function1<V,V> f : out) {
+                        ret = f.applyEx(ret);
+                    }
+                    return ret;
                 }
-                return ret;
             };
         }
     }
@@ -181,10 +207,25 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
                 (in instanceof UnmodIterable) ? (UnmodIterable<Function1<T,Boolean>>) in
                                      : Xform.of(in);
 
-        return v.filter(p -> (p != null) && (p != ACCEPT))
-                .foldLeft(accept(),
-                          (accum, p) -> (p == REJECT) ? p : and(accum, p),
-                          accum -> accum == REJECT);
+        return v.filter(new Function1<Function1<T, Boolean>, Boolean>() {
+            @Override
+            public Boolean applyEx(Function1<T, Boolean> p) throws Exception {
+                return (p != null) && (p != ACCEPT);
+            }
+        })
+                .foldLeft(Function1.<T>accept(),
+                        new Function2<Function1<T, Boolean>, Function1<T, Boolean>, Function1<T, Boolean>>() {
+                            @Override
+                            public Function1<T, Boolean> applyEx(Function1<T, Boolean> accum, Function1<T, Boolean> p) throws Exception {
+                                return (p == REJECT) ? p : and(accum, p);
+                            }
+                        },
+                        new Function1<Function1<T, Boolean>, Boolean>() {
+                            @Override
+                            public Boolean applyEx(Function1<T, Boolean> accum) throws Exception {
+                                return accum == REJECT;
+                            }
+                        });
     }
 
     /**
@@ -206,17 +247,30 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     static <T> Function1<T,Boolean> or(Iterable<Function1<T,Boolean>> in) {
         if (in == null) { return reject(); }
 
-        Transformable<Function1<T,Boolean>> v =
-                (in instanceof UnmodIterable) ? (UnmodIterable<Function1<T,Boolean>>) in
-                                     : Xform.of(in);
+        Transformable<Function1<T, Boolean>> v =
+                (in instanceof UnmodIterable) ? (UnmodIterable<Function1<T, Boolean>>) in
+                        : Xform.of(in);
 
-        return v.filter(p -> (p != null) && (p != REJECT))
-                .foldLeft(reject(),
-                          (accum, p) -> (p == ACCEPT) ? p : or(accum, p),
-                          accum -> accum == ACCEPT);
+        return v.filter(new Function1<Function1<T, Boolean>, Boolean>() {
+            @Override
+            public Boolean applyEx(Function1<T, Boolean> p) throws Exception {
+                return (p != null) && (p != REJECT);
+            }
+        })
+                .foldLeft(Function1.<T>reject(), new Function2<Function1<T, Boolean>, Function1<T, Boolean>, Function1<T, Boolean>>() {
+                    @Override
+                    public Function1<T, Boolean> applyEx(Function1<T, Boolean> accum, Function1<T, Boolean> p) throws Exception {
+                        return (p == ACCEPT) ? p : or(accum, p);
+                    }
+                }, new Function1<Function1<T, Boolean>, Boolean>() {
+                    @Override
+                    public Boolean applyEx(Function1<T, Boolean> accum) throws Exception {
+                        return accum == ACCEPT;
+                    }
+                });
     }
 
-    enum BooleanCombiner {
+    public enum BooleanCombiner {
         AND {
             @Override
             public <T> Function1<T,Boolean> combine(Iterable<Function1<T,Boolean>> in) {
@@ -238,7 +292,7 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
      will return identical output very quickly.  Please note that the return values from f need to
      implement equals() and hashCode() correctly for this to work correctly and quickly.
      */
-    static <A,B> Function1<A,B> memoize(Function1<A,B> f) {
+    public static <A,B> Function1<A,B> memoize(final Function1<A,B> f) {
         return new Function1<A,B>() {
             private final Map<A,Option<B>> memo = new HashMap<>();
             @Override
@@ -255,10 +309,10 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     // ========================================= Instance =========================================
 
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    U applyEx(T t) throws Exception;
+    public abstract U applyEx(T t) throws Exception;
 
     /** Call this convenience method so that you don't have to worry about checked exceptions. */
-    @Override default U apply(T t) {
+    private U apply(T t) {
         try {
             return applyEx(t);
         } catch (RuntimeException re) {
@@ -269,10 +323,10 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
     }
 
     /** For compatibility with java.util.function.Consumer.  Just a wrapper around apply(). */
-    @Override default void accept(T t) { apply(t); }
+    @Override public final U call(T t) { return apply(t); }
 
     @SuppressWarnings("unchecked")
-    default <S> Function1<S,U> compose(final Function1<? super S, ? extends T> f) {
+    public <S> Function1<S,U> compose(final Function1<? super S, ? extends T> f) {
         if (f == IDENTITY) {
             // This violates type safety, but makes sense - composing any function with the
             // identity function should return the original function unchanged.  If you mess up the
@@ -281,6 +335,11 @@ public interface Function1<T,U> extends Function<T,U>, Consumer<T> {
             return (Function1<S,U>) this;
         }
         final Function1<T,U> parent = this;
-        return s -> parent.applyEx(f.applyEx(s));
+        return new Function1<S, U>() {
+            @Override
+            public U applyEx(S s) throws Exception {
+                return parent.applyEx(f.applyEx(s));
+            }
+        };
     }
 }
