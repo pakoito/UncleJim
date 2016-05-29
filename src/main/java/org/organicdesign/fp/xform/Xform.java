@@ -48,7 +48,7 @@ import java.util.Objects;
  */
 public abstract class Xform<A> implements UnmodIterable<A> {
 
-    enum OpStrategy { HANDLE_INTERNALLY, ASK_SUPPLIER, CANNOT_HANDLE; }
+    enum OpStrategy { HANDLE_INTERNALLY, ASK_SUPPLIER, CANNOT_HANDLE }
 
     private static final Object TERMINATE = new Object();
     @SuppressWarnings("unchecked")
@@ -73,8 +73,8 @@ public abstract class Xform<A> implements UnmodIterable<A> {
          do either.
          */
         public Or<Long,OpStrategy> drop(long num) {
-            return (num < 1) ? Or.good(0L)
-                             : Or.bad(OpStrategy.CANNOT_HANDLE);
+            return (num < 1) ? Or.<Long,OpStrategy>good(0L)
+                             : Or.<Long,OpStrategy>bad(OpStrategy.CANNOT_HANDLE);
         }
 
         /**
@@ -95,12 +95,15 @@ public abstract class Xform<A> implements UnmodIterable<A> {
             private long leftToDrop;
             DropOp(long drop) {
                 leftToDrop = drop;
-                filter = o -> {
-                    if (leftToDrop > 0) {
-                        leftToDrop = leftToDrop - 1;
-                        return Boolean.FALSE;
+                filter = new Function1<Object, Boolean>() {
+                    @Override
+                    public Boolean applyEx(Object o) throws Exception {
+                        if (leftToDrop > 0) {
+                            leftToDrop = leftToDrop - 1;
+                            return Boolean.FALSE;
+                        }
+                        return Boolean.TRUE;
                     }
-                    return Boolean.TRUE;
                 };
             }
             @Override public Or<Long,OpStrategy> drop(long num) {
@@ -140,12 +143,15 @@ public abstract class Xform<A> implements UnmodIterable<A> {
             private long numToTake;
             TakeOp(long take) {
                 numToTake = take;
-                map = a -> {
-                    if (numToTake > 0) {
-                        numToTake = numToTake - 1;
-                        return a;
+                map = new Function1() {
+                    @Override
+                    public Object applyEx(Object a) throws Exception {
+                        if (numToTake > 0) {
+                            numToTake = numToTake - 1;
+                            return a;
+                        }
+                        return TERMINATE;
                     }
-                    return TERMINATE;
                 };
             }
 
@@ -204,7 +210,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         private AppendOp(RunList prv, Iterable src) { super(prv, src); }
 
         @Override public Iterator iterator() {
-            ArrayList prevSrc = _foldLeft(prev, prev.opArray(), 0, new ArrayList(),
+            final ArrayList prevSrc = _foldLeft(prev, prev.opArray(), 0, new ArrayList(),
                                           new Function2<ArrayList,Object,ArrayList>() {
                                               @SuppressWarnings("unchecked")
                                               @Override
@@ -232,6 +238,11 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 
                 @Override public Object next() {
                     return innerIter.next();
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException("remove");
                 }
             };
         } // end iterator()
@@ -447,12 +458,12 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         for (Object o : source) {
             for (int j = opIdx; j < ops.length; j++) {
                 Operation op = ops[j];
-                if ( (op.filter != null) && !op.filter.apply(o) ) {
+                if ( (op.filter != null) && !op.filter.call(o) ) {
                     // stop processing this source item and go to the next one.
                     continue sourceLoop;
                 }
                 if (op.map != null) {
-                    o = op.map.apply(o);
+                    o = op.map.call(o);
                     // This is how map can handle takeWhile, take, and other termination marker
                     // roles.  Remember, the fewer functions we have to check for, the faster this
                     // will execute.
@@ -460,7 +471,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
                         return (H) ret;
                     }
                 } else if (op.flatMap != null) {
-                    ret = _foldLeft(op.flatMap.apply(o), ops, j + 1, (H) ret, reducer);
+                    ret = _foldLeft(op.flatMap.call(o), ops, j + 1, (H) ret, reducer);
                     // stop processing this source item and go to the next one.
                     continue sourceLoop;
                 }
@@ -469,7 +480,7 @@ public abstract class Xform<A> implements UnmodIterable<A> {
 //                    }
             }
             // Here, the item made it through all the operations.  Combine it with the result.
-            ret = reducer.apply(ret, o);
+            ret = reducer.call(ret, o);
         }
         return (H) ret;
     } // end _foldLeft();
@@ -566,8 +577,8 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         // this exact problem.
         List<A> as = this.toMutableList();
         for (A a : as) {
-            ident = reducer.apply(ident, a);
-            if (terminateWhen.apply(ident)) {
+            ident = reducer.call(ident, a);
+            if (terminateWhen.call(ident)) {
                 return ident;
             }
         }
@@ -596,12 +607,17 @@ public abstract class Xform<A> implements UnmodIterable<A> {
         return new TakeDesc<>(this, numItems);
     }
 
-    @Override public Xform<A> takeWhile(Function1<? super A,Boolean> f) {
+    @Override public Xform<A> takeWhile(final Function1<? super A,Boolean> f) {
         if (f == null) {
             throw new IllegalArgumentException("Can't takeWhile with a null function.");
         }
         // I'm coding this as a map operation that either returns the source, or a TERMINATE
         // sentinel value.
-        return new MapDesc<>(this, a -> f.apply(a) ? a : terminate());
+        return new MapDesc<>(this, new Function1<A, A>() {
+            @Override
+            public A applyEx(A a) throws Exception {
+                return f.call(a) ? a : terminate();
+            }
+        });
     }
 }

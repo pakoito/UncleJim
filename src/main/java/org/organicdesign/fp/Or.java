@@ -46,10 +46,10 @@ public abstract class Or<G,B> {
     public abstract B bad();
 
     /** Construct a new Good from the given object. */
-    static <G,B> Good<G,B> good(G good) { return new Good<>(good); }
+    public static <G,B> Good<G,B> good(G good) { return new Good<>(good); }
 
     /** Construct a new Bad from the given object. */
-    static <G,B> Bad<G,B> bad(B bad) { return new Bad<>(bad); }
+    public static <G,B> Bad<G,B> bad(B bad) { return new Bad<>(bad); }
 
     /**
      Pattern-match, applying the first function if the given either is a Bad, the second if it's a Good.
