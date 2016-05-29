@@ -6,7 +6,7 @@ package org.organicdesign.fp.collections;
  This bridges that gap to let PersistentHashSet know about the asTransient() method for accessing PersistentHashMap's
  inner transient class, which in turn, allows this class to implement keySet for PersistentHashMap.  Also allows
  */
-public abstract class ImMapTrans<K,V> implements ImMap<K,V> {
+public abstract class ImMapTrans<K,V> extends ImMap<K,V> {
     public abstract ImMapTrans<K,V> asTransient();
 
     /** Returns the Equator used by this map for equals comparisons and hashCodes */
