@@ -14,7 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ImSetTest {
-    static class TestSet<E> implements ImSet<E> {
+    static class TestSet<E> extends ImSet<E> {
         static <T> Set<T> dup(Collection<T> in) {
             Set<T> out = new HashSet<>();
             out.addAll(in);

@@ -148,7 +148,7 @@ public class PersistentTreeSet<E> extends ImSortedSet<E> {
         SortedSet that = ((SortedSet) other);
 
         if (size() != that.size()) { return false; }
-        return UnmodSortedIterable.equals(this, Helpers.castFromSortedSet(that));
+        return UnmodSortedIterable.Helpers.equals2(this, UnmodSortedIterable.Helpers.castFromSortedSet(that));
     }
 
     /**
@@ -166,7 +166,7 @@ public class PersistentTreeSet<E> extends ImSortedSet<E> {
     @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.Helpers.hashCode(this); }
 
     /** {@inheritDoc} */
-    @Override public Option<E> head() { return size() > 0 ? Option.of(impl.firstKey()) : Option.none(); }
+    @Override public Option<E> head() { return size() > 0 ? Option.of(impl.firstKey()) : Option.<E>none(); }
 
     /** {@inheritDoc} */
     @Override public boolean isEmpty() { return impl.isEmpty(); }

@@ -19,7 +19,7 @@ import org.organicdesign.fp.collections.interfaces.UnmodSortedSet;
 import java.util.Comparator;
 
 /** An immutable sorted set interface */
-public abstract class ImSortedSet<E> implements ImSet<E>, UnmodSortedSet<E> {
+public abstract class ImSortedSet<E> extends ImSet<E> implements UnmodSortedSet<E> {
     /** {@inheritDoc} */
     @Override
     public abstract ImSortedSet<E> put(E e);

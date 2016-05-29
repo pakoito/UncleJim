@@ -325,7 +325,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
 //                Collection<V> that = (Collection<V>) o;
 //                if (that.size() != this.size()) { return false; }
 //
-//                return UnmodSortedIterable.equals(this,
+//                return UnmodSortedIterable.Helpers.equals2(this,
 //                                                  UnmodSortedIterable.castFromCollection(that));
 //            }
 //            @Override public String toString() {

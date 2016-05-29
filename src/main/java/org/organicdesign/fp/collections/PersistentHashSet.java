@@ -23,7 +23,7 @@ import java.util.Set;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
 */
-public class PersistentHashSet<E> implements ImSet<E> {
+public class PersistentHashSet<E> extends ImSet<E> {
 
     // If you don't put this here, it inherits EMPTY from UnmodSet, which does not have .equals()
     // defined.  UnmodSet.empty won't put() either.
@@ -120,7 +120,7 @@ public class PersistentHashSet<E> implements ImSet<E> {
         return new TransientHashSet<>(impl.asTransient());
     }
 
-    static final class TransientHashSet<E> implements ImSet<E> {
+    static final class TransientHashSet<E> extends ImSet<E> {
         ImMapTrans<E,E> impl;
 
         TransientHashSet(ImMapTrans<E,E> impl) {

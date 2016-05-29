@@ -56,7 +56,7 @@ public class RangeOfInt implements UnmodList<Integer> {
                 return o1.equals(o2);
             }
             return o1.size() == o2.size() &&
-                   UnmodSortedIterable.equals(Helpers.castFromList(o1),
+                   UnmodSortedIterable.Helpers.equals2(Helpers.castFromList(o1),
                                               Helpers.castFromList(o2));
         }
     };
@@ -218,7 +218,7 @@ public class RangeOfInt implements UnmodList<Integer> {
 //        // Slower compare for other lists:
 //        final List that = (List) other;
 //        // This is not a database object; compare "significant" fields here.
-//        return UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromList(that));
+//        return UnmodSortedIterable.Helpers.equals2(this, UnmodSortedIterable.castFromList(that));
 //    }
 
     @Override

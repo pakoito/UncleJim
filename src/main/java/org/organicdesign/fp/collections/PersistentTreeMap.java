@@ -11,13 +11,9 @@ package org.organicdesign.fp.collections;
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.collections.interfaces.*;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.SortedMap;
-import java.util.Stack;
+import java.util.*;
+
+import static org.organicdesign.fp.collections.interfaces.UnmodSortedIterable.Helpers.castFromSortedMap;
 
 /**
  Persistent Red Black Tree. Note that instances of this class are constant values
@@ -128,7 +124,12 @@ public class PersistentTreeMap<K,V> extends ImSortedMap<K,V> {
         // This may be faster, but I haven't timed it.
 
         // Preserve comparator!
-        ImSortedSet<Entry<K,V>> ret = PersistentTreeSet.ofComp((a, b) -> comp.compare(a.getKey(), b.getKey()));
+        ImSortedSet<Entry<K,V>> ret = PersistentTreeSet.ofComp(new Comparator<Entry<K, V>>() {
+            @Override
+            public int compare(Entry<K, V> a, Entry<K, V> b) {
+                return comp.compare(a.getKey(), b.getKey());
+            }
+        });
 
         UnmodIterator<UnEntry<K,V>> iter = this.iterator();
         while (iter.hasNext()) { ret = ret.put(iter.next()); }
@@ -148,7 +149,7 @@ public class PersistentTreeMap<K,V> extends ImSortedMap<K,V> {
         public boolean eq(SortedMap o1, SortedMap o2) {
             if (o1 == o2) { return true; }
             if ( o1.size() != o2.size() ) { return false; }
-            return UnmodSortedIterable.equals(Helpers.castFromSortedMap(o1), Helpers.castFromSortedMap(o2));
+            return UnmodSortedIterable.Helpers.equals2(castFromSortedMap(o1), castFromSortedMap(o2));
         }
     };
 
@@ -173,7 +174,7 @@ public class PersistentTreeMap<K,V> extends ImSortedMap<K,V> {
         // Yay, this makes sense, and we can compare these with O(n) efficiency while still maintaining compatibility
         // with java.util.Map.
         if (other instanceof SortedMap) {
-            return UnmodSortedIterable.equals(this, Helpers.castFromSortedMap((SortedMap) other));
+            return UnmodSortedIterable.Helpers.equals2(this, castFromSortedMap((SortedMap) other));
         }
 
         // This makes no sense and takes O(n log n) or something.
@@ -283,7 +284,7 @@ public class PersistentTreeMap<K,V> extends ImSortedMap<K,V> {
 //            @Override public boolean equals(Object o) {
 //                if (this == o) { return true; }
 //                if ( !(o instanceof UnmodSortedIterable) ) { return false; }
-//                return UnmodSortedIterable.equals(this, (UnmodSortedIterable) o);
+//                return UnmodSortedIterable.Helpers.equals2(this, (UnmodSortedIterable) o);
 //            }
 //            @Override public String toString() { return UnmodSortedIterable.toString("ValueColl", this); }
 //        }
@@ -298,7 +299,7 @@ public class PersistentTreeMap<K,V> extends ImSortedMap<K,V> {
                 t = t.left();
             }
         }
-        return Option.of(t);
+        return Option.<UnEntry<K, V>>of(t);
     }
 
     /** {@inheritDoc} */
@@ -318,7 +319,7 @@ public class PersistentTreeMap<K,V> extends ImSortedMap<K,V> {
         }
         // Don't iterate through entire map for only the last item.
         if (compFromKeyLastKey == 0) {
-            return ofComp(comp, Collections.singletonList(last));
+            return ofComp(comp, Collections.<Entry<K, V>>singletonList(last));
         }
 
         ImSortedMap<K,V> ret = new PersistentTreeMap<>(comp, null, 0);
@@ -735,7 +736,7 @@ public class PersistentTreeMap<K,V> extends ImSortedMap<K,V> {
                      Node<? extends K,? extends V> right) {
         if (left == null && right == null) {
             if (val == null)
-                return new Black<>(key);
+                return new Black<K,V>(key);
             return new BlackVal<K,V>(key, val);
         }
         if (val == null)

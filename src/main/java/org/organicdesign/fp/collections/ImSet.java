@@ -16,7 +16,7 @@ package org.organicdesign.fp.collections;
 import org.organicdesign.fp.collections.interfaces.UnmodSet;
 
 /** An immutable set interface */
-public interface ImSet<E> extends UnmodSet<E> {
+public abstract class ImSet<E> implements UnmodSet<E> {
     /**
      Adds an element, returning a modified version of the set (leaving the original set unchanged).
      If the element already exists in this set, the new value overwrites the old one.  If the new
@@ -26,13 +26,13 @@ public interface ImSet<E> extends UnmodSet<E> {
      @param e the element to add to this set
      @return a new set with the element added (see note above about adding duplicate elements).
      */
-    ImSet<E> put(E e);
+    public abstract ImSet<E> put(E e);
 
     /**
      Removes the given item, returning a modified version of the set (leaving the original set
      unchanged).
      */
-    ImSet<E> without(E key);
+    public abstract ImSet<E> without(E key);
 
 //    /**
 //     A sequence of the items contained in this set.  Note that for some implementations, multiple
@@ -40,7 +40,7 @@ public interface ImSet<E> extends UnmodSet<E> {
 //     */
 //    Sequence<E> seq();
 
-    default ImSet<E> union(Iterable<? extends E> iter) {
+    public ImSet<E> union(Iterable<? extends E> iter) {
         if (iter == null) { return this; }
         ImSet<E> ret = this;
         for (E e : iter) { ret = ret.put(e); }

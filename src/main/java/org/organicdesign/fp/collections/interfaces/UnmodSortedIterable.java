@@ -66,7 +66,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
         }
 
         /** This is correct, but O(n).  This only works with an ordered iterable. */
-        static boolean equals(UnmodSortedIterable a, UnmodSortedIterable b) {
+        public static boolean equals2(UnmodSortedIterable a, UnmodSortedIterable b) {
             // Cheapest operation first...
             if (a == b) { return true; }
 
