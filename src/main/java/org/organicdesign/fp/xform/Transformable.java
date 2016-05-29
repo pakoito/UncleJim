@@ -168,7 +168,12 @@ public interface Transformable<T> {
      Realize a thread-safe immutable list to access items quickly O(log32 n) by index.
      */
     default ImList<T> toImList() {
-        return foldLeft(PersistentVector.empty(), PersistentVector::append);
+        return foldLeft(PersistentVector.<T>empty(), new Function2<ImList<T>, T, ImList<T>>() {
+            @Override
+            public ImList<T> applyEx(ImList<T> objects, T t) throws Exception {
+                return objects.append(t);
+            }
+        });
     }
 
     /**
@@ -183,9 +188,14 @@ public interface Transformable<T> {
 
      @return An immutable map
      */
-    default <K,V> ImMap<K,V> toImMap(Function1<? super T,Map.Entry<K,V>> f1) {
-        return foldLeft((ImMap<K, V>) PersistentHashMap.<K, V>empty(),
-                        (ts, t) -> ts.assoc(f1.apply(t)));
+    default <K,V> ImMap<K,V> toImMap(final Function1<? super T,Map.Entry<K,V>> f1) {
+        return foldLeft(PersistentHashMap.<K, V>empty(),
+                new Function2<ImMap<K, V>, T, ImMap<K, V>>() {
+                    @Override
+                    public ImMap<K, V> applyEx(ImMap<K, V> ts, T t) throws Exception {
+                        return ts.assoc(f1.call(t));
+                    }
+                });
     }
 
     /**
@@ -196,7 +206,12 @@ public interface Transformable<T> {
      @return An immutable set (with duplicates removed)
      */
     default ImSet<T> toImSet() {
-        return foldLeft(PersistentHashSet.empty(), PersistentHashSet::put);
+        return foldLeft(PersistentHashSet.<T>empty(), new Function2<ImSet<T>, T, ImSet<T>>() {
+            @Override
+            public ImSet<T> applyEx(ImSet<T> objects, T t) throws Exception {
+                return objects.put(t);
+            }
+        });
     }
 
     /**
@@ -217,9 +232,14 @@ public interface Transformable<T> {
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
      */
     default <K,V> ImSortedMap<K,V> toImSortedMap(Comparator<? super K> comp,
-                                                 Function1<? super T,Map.Entry<K,V>> f1) {
-        return foldLeft((ImSortedMap<K, V>) PersistentTreeMap.<K, V>empty(comp),
-                        (ts, t) -> ts.assoc(f1.apply(t)));
+                                                 final Function1<? super T,Map.Entry<K,V>> f1) {
+        return foldLeft(PersistentTreeMap.<K, V>empty(comp),
+                new Function2<ImSortedMap<K, V>, T, ImSortedMap<K, V>>() {
+                    @Override
+                    public ImSortedMap<K, V> applyEx(ImSortedMap<K, V> ts, T t) throws Exception {
+                        return ts.assoc(f1.call(t));
+                    }
+                });
     }
 
     /**
@@ -231,14 +251,22 @@ public interface Transformable<T> {
      @return An immutable set (with duplicates removed).  Null elements are not allowed.
      */
     default ImSortedSet<T> toImSortedSet(Comparator<? super T> comparator) {
-        return foldLeft(PersistentTreeSet.ofComp(comparator), PersistentTreeSet::put);
+        return foldLeft(PersistentTreeSet.ofComp(comparator), new Function2<ImSortedSet<T>, T, ImSortedSet<T>>() {
+            @Override
+            public ImSortedSet<T> applyEx(ImSortedSet<T> ts, T t) throws Exception {
+                return ts.put(t);
+            }
+        });
     }
 
     /** Realize a mutable list.  Use toImList unless you need to modify the list in-place. */
     default List<T> toMutableList() {
-        return foldLeft(new ArrayList<>(), (ts, t) -> {
-            ts.add(t);
-            return ts;
+        return foldLeft(new ArrayList<T>(), new Function2<List<T>, T, List<T>>() {
+            @Override
+            public List<T> applyEx(List<T> ts, T t) throws Exception {
+                ts.add(t);
+                return ts;
+            }
         });
     }
 
@@ -251,10 +279,13 @@ public interface Transformable<T> {
      @return A map with the keys from the given set, mapped to values using the given function.
      */
     default <K,V> Map<K,V> toMutableMap(final Function1<? super T,Map.Entry<K,V>> f1) {
-        return foldLeft(new HashMap<>(), (ts, t) -> {
-            Map.Entry<K,V> entry = f1.apply(t);
-            ts.put(entry.getKey(), entry.getValue());
-            return ts;
+        return foldLeft(new HashMap<K,V>(), new Function2<Map<K,V>, T, Map<K,V>>() {
+            @Override
+            public Map<K,V> applyEx(Map<K,V> ts, T t) throws Exception {
+                Map.Entry<K,V> entry = f1.call(t);
+                ts.put(entry.getKey(), entry.getValue());
+                return ts;
+            }
         });
     }
 
@@ -271,10 +302,13 @@ public interface Transformable<T> {
     default <K,V> SortedMap<K,V>
     toMutableSortedMap(Comparator<? super K> comp,
                        final Function1<? super T,Map.Entry<K,V>> f1) {
-        return foldLeft(new TreeMap<>(), (ts, t) -> {
-            Map.Entry<K,V> entry = f1.apply(t);
-            ts.put(entry.getKey(), entry.getValue());
-            return ts;
+        return foldLeft(new TreeMap<K, V>(), new Function2<SortedMap<K,V>, T, SortedMap<K,V>>() {
+            @Override
+            public SortedMap<K,V> applyEx(SortedMap<K,V> ts, T t) throws Exception {
+                Map.Entry<K,V> entry = f1.call(t);
+                ts.put(entry.getKey(), entry.getValue());
+                return ts;
+            }
         });
     }
 
@@ -284,9 +318,12 @@ public interface Transformable<T> {
      @return A mutable set (with duplicates removed)
      */
     default Set<T> toMutableSet() {
-        return foldLeft(new HashSet<>(), (ts, t) -> {
-            ts.add(t);
-            return ts;
+        return foldLeft(new HashSet<T>(), new Function2<Set<T>, T, Set<T>>() {
+            @Override
+            public Set<T> applyEx(Set<T> ts, T t) throws Exception {
+                ts.add(t);
+                return ts;
+            }
         });
     }
 
@@ -298,9 +335,12 @@ public interface Transformable<T> {
      @return A mutable sorted set
      */
     default SortedSet<T> toMutableSortedSet(Comparator<? super T> comparator) {
-        return foldLeft(new TreeSet<>(comparator), (ts, t) -> {
-            ts.add(t);
-            return ts;
+        return foldLeft(new TreeSet<>(comparator), new Function2<SortedSet<T>, T, SortedSet<T>>() {
+            @Override
+            public SortedSet<T> applyEx(SortedSet<T> ts, T t) throws Exception {
+                ts.add(t);
+                return ts;
+            }
         });
     }
 }
