@@ -14,23 +14,21 @@
 
 package org.organicdesign.fp.function;
 
-import java.util.concurrent.Callable;
-import java.util.function.Supplier;
+import rx.functions.Func0;
 
 /**
  This is like Java 8's java.util.function.Supplier, but retrofitted to turn checked exceptions
  into unchecked ones.  It's also called a thunk when used to delay evaluation.
  */
-@FunctionalInterface
-public interface Function0<U> extends Supplier<U>, Callable<U> {
+public abstract class Function0<U> implements Func0<U> {
     /** Implement this one method and you don't have to worry about checked exceptions. */
-    U applyEx() throws Exception;
+    abstract U applyEx() throws Exception;
 
     /**
      The class that takes a consumer as an argument uses this convenience method so that it
      doesn't have to worry about checked exceptions either.
      */
-    default U apply() {
+    private U apply() {
         try {
             return applyEx();
         } catch (RuntimeException re) {
@@ -41,10 +39,7 @@ public interface Function0<U> extends Supplier<U>, Callable<U> {
     }
 
     /** {@inheritDoc} */
-    @Override default U get() { return apply(); }
-
-    /** {@inheritDoc} */
-    @Override default U call() throws Exception { return applyEx(); }
+    @Override public U call() { return apply(); }
 
     // ========================================== Static ==========================================
     public static final Function0<Object> NULL = new Function0<Object>() {
@@ -67,10 +62,10 @@ public interface Function0<U> extends Supplier<U>, Callable<U> {
             @Override public int hashCode() { return (k == null) ? 0 : k.hashCode(); }
             @Override public boolean equals(Object o) {
                 if (this == o) { return true; }
-                if ( (o == null) || !(o instanceof Supplier) ) { return false; }
-                return k.equals(((Supplier) o).get());
+                if ( (o == null) || !(o instanceof Function0) ) { return false; }
+                return k.equals(((Function0) o).call());
             }
-            @Override public String toString() { return "() -> " + k; };
+            @Override public String toString() { return "() -> " + k; }
         };
     }
 
