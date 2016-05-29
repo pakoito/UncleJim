@@ -38,7 +38,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
     static <T> void permutations(List<T> items, Function2<? super T,? super T,?> f) {
         for (int i = 0; i < items.size(); i++) {
             for (int j = i + 1; j < items.size(); j++) {
-                f.apply(items.get(i), items.get(j));
+                f.call(items.get(i), items.get(j));
             }
         }
     }
