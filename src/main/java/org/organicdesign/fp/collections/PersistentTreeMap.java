@@ -230,7 +230,7 @@ public class PersistentTreeMap<K,V> extends ImSortedMap<K,V> {
         }
         // Don't iterate through entire map for only the last item.
         if (compFromKeyLastKey == 0) {
-            return ofComp(comp, Collections.singletonList(last));
+            return ofComp(comp, Collections.<Entry<K, V>>singletonList(last));
         }
 
         ImSortedMap<K,V> ret = new PersistentTreeMap<>(comp, null, 0);
@@ -543,7 +543,7 @@ public class PersistentTreeMap<K,V> extends ImSortedMap<K,V> {
         while (t != null) {
             int c = comp.compare(key, t.key);
             if (c == 0)
-                return Option.of(t);
+                return Option.<UnEntry<K, V>>of(t);
             else if (c < 0)
                 t = t.left();
             else
