@@ -42,7 +42,7 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 	<packaging>jar</packaging>
 
 	<name>UncleJim</name>
-	<description>Immutable Clojure collections and a Transformation abstraction for Java 8+, immutably, type-safely, and with good performance.</description>
+	<description>Immutable Clojure collections and a Transformation abstraction for RxJava, immutably, type-safely, and with good performance.</description>
 	<url>https://github.com/GlenKPeterson/UncleJim</url>
 
 	<licenses>
@@ -80,12 +80,9 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
-					<!--
-                    I'm favoring the maven.compiler properties over this for now...
 					<compilerVersion>1.8</compilerVersion>
-					<source>1.8</source>
-					<target>1.8</target>
-					 -->
+					<source>1.7</source>
+					<target>1.7</target>
 					<compilerArgs>
 						<arg>-profile</arg>
 						<arg>compact1</arg>
@@ -171,6 +168,11 @@ http://mvnrepository.com/artifact/org.organicdesign/UncleJim
 		</plugins>
 	</build>
 	<dependencies>
+		<dependency>
+			<groupId>io.reactivex</groupId>
+			<artifactId>rxjava</artifactId>
+			<version>1.1.5</version>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
