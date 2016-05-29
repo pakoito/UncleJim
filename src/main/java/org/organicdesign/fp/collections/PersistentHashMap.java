@@ -158,7 +158,7 @@ public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
 
     private PersistentHashMap(Equator<K> eq, int count, INode<K,V> root, boolean hasNull,
                               V nullValue) {
-        this.equator = (eq == null) ? Equator.defaultEquator() : eq;
+        this.equator = (eq == null) ? Equator.<K>defaultEquator() : eq;
         this.count = count;
         this.root = root;
         this.hasNull = hasNull;
@@ -177,7 +177,7 @@ public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
             return new PersistentHashMap<>(equator, hasNull ? count : count + 1, root, true, val);
         }
         Box addedLeaf = new Box(null);
-        INode<K,V> newroot = (root == null ? BitmapIndexedNode.empty(equator) : root);
+        INode<K,V> newroot = (root == null ? BitmapIndexedNode.<K, V>empty(equator) : root);
         newroot = newroot.assoc(0, equator.hash(key), key, val, addedLeaf);
         if (newroot == root) {
             return this;
@@ -192,7 +192,7 @@ public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
 
     @Override public Option<UnmodMap.UnEntry<K,V>> entry(K key) {
         if (key == null) {
-            return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
+            return hasNull ? Option.<UnEntry<K, V>>of(Tuple2.<K, V>of(null, nullValue)) : Option.<UnEntry<K, V>>none();
         }
         if (root == null) {
             return Option.none();
@@ -243,8 +243,12 @@ public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
 
     // This is cut and pasted exactly to the Transient version of this class below.
     @Override public UnmodIterator<UnEntry<K,V>> iterator() {
-        final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? emptyUnmodIterator()
-                                                                    : root.iterator();
+        final UnmodIterator<UnEntry<K,V>> rootIter;
+        if (root == null) {
+            rootIter = emptyUnmodIterator();
+        } else {
+            rootIter = root.iterator();
+        }
         if (hasNull) {
             return new UnmodIterator<UnEntry<K,V>>() {
                 private boolean seen = false;
@@ -365,7 +369,7 @@ public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
             }
 //        Box leafFlag = new Box(null);
             leafFlag.val = null;
-            INode<K,V> n = (root == null ? BitmapIndexedNode.empty(equator) : root);
+            INode<K,V> n = (root == null ? BitmapIndexedNode.<K, V>empty(equator) : root);
             n = n.assoc(edit, 0, equator.hash(key), key, val, leafFlag);
             if (n != this.root)
                 this.root = n;
@@ -378,7 +382,7 @@ public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
         @Override public Option<UnEntry<K,V>> entry(K key) {
             ensureEditable();
             if (key == null) {
-                return hasNull ? Option.of(Tuple2.of(null, nullValue)) : Option.none();
+                return hasNull ? Option.<UnEntry<K, V>>of(Tuple2.<K, V>of(null, nullValue)) : Option.<UnEntry<K, V>>none();
             }
             if (root == null) {
                 return Option.none();
@@ -396,8 +400,12 @@ public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
 
         // This is an exact cut-and paste of the Persistent version of this class above.
         @Override public UnmodIterator<UnEntry<K,V>> iterator() {
-            final UnmodIterator<UnEntry<K,V>> rootIter = (root == null) ? emptyUnmodIterator()
-                                                                        : root.iterator();
+            final UnmodIterator<UnEntry<K,V>> rootIter;
+            if (root == null) {
+                rootIter = emptyUnmodIterator();
+            } else {
+                rootIter = root.iterator();
+            }
             if (hasNull) {
                 return new UnmodIterator<UnEntry<K,V>>() {
                     private boolean seen = false;
@@ -786,8 +794,8 @@ public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
                                 nodes[i] = (INode) array[j+1];
                             else
                                 nodes[i] = empty(equator).assoc(shift + 5,
-                                                                equator.hash(k(array, j)),
-                                                                k(array, j), array[j + 1],
+                                                                equator.hash(PersistentHashMap.<K>k(array, j)),
+                                                                PersistentHashMap.<K>k(array, j), array[j + 1],
                                                                 addedLeaf);
                             j += 2;
                         }
@@ -957,8 +965,8 @@ public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
                                 nodes[i] = (INode) array[j+1];
                             else
                                 nodes[i] = empty(equator).assoc(edit, shift + 5,
-                                                                equator.hash(k(array, j)),
-                                                                k(array, j), array[j + 1],
+                                                                equator.hash(PersistentHashMap.<K>k(array, j)),
+                                                                PersistentHashMap.<K>k(array, j), array[j + 1],
                                                                 addedLeaf);
                             j += 2;
                         }
@@ -1057,8 +1065,8 @@ public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
             int idx = findIndex(key);
             if(idx < 0)
                 return null;
-            if(equator.eq(key, k(array, idx)))
-                return Tuple2.of(k(array, idx), v(array, idx + 1));
+            if(equator.eq(key, PersistentHashMap.<K>k(array, idx)))
+                return Tuple2.of(PersistentHashMap.<K>k(array, idx), PersistentHashMap.<V>v(array, idx + 1));
             return null;
         }
 
@@ -1089,7 +1097,7 @@ public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
 
         public int findIndex(K key){
             for (int i = 0; i < 2*count; i+=2) {
-                if (equator.eq(key, k(array, i))) { return i; }
+                if (equator.eq(key, PersistentHashMap.<K>k(array, i))) { return i; }
             }
             return -1;
         }
@@ -1361,7 +1369,7 @@ public static void main(String[] args){
                 int i = mutableIndex;
                 mutableIndex = i + 2;
                 if (array[i] != null) {
-                    nextEntry = Tuple2.of(k(array, i), v(array, i+1));
+                    nextEntry = Tuple2.of(PersistentHashMap.<K>k(array, i), PersistentHashMap.<V>v(array, i+1));
                     return true;
                 } else {
                     INode<K,V> node = iNode(array, i + 1);

@@ -54,7 +54,7 @@ public abstract class Option<T> { // extends UnmodSortedIterable<T> {
     }
 
     /** Construct an option, but if t is null, make it None instead of Some. */
-    static <T> Option<T> someOrNullNoneOf(T t) {
+    public static <T> Option<T> someOrNullNoneOf(T t) {
         if ( (t == null) || NONE.equals(t) ) {
             return none();
         }
