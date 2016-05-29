@@ -30,11 +30,11 @@ import java.util.Comparator;
  inherited from java.lang.Object.  I'd deprecate those methods, but you can't do that on an
  interface.
  */
-public interface Equator<T> {
+public abstract class Equator<T> {
 
     // ============================================= Static ========================================
 
-    Equator<Object> DEFAULT_EQUATOR = new Equator<Object>() {
+    public static final Equator<Object> DEFAULT_EQUATOR = new Equator<Object>() {
         @Override public int hash(Object o) {
             return (o == null) ? 0 : o.hashCode();
         }
@@ -46,53 +46,56 @@ public interface Equator<T> {
     };
 
     @SuppressWarnings("unchecked")
-    static <T> Equator<T> defaultEquator() { return (Equator<T>) DEFAULT_EQUATOR; }
+    public static <T> Equator<T> defaultEquator() { return (Equator<T>) DEFAULT_EQUATOR; }
 
     @SuppressWarnings("ConstantConditions")
-    Comparator<Comparable<Object>> DEFAULT_COMPARATOR =
-            (o1, o2) -> {
-                if (o1 == o2) { return 0; }
-                if (o1 == null) {
-                    return - (o2.compareTo(o1));
-                }
-                return o1.compareTo(o2);
-            };
+    public static final
+    Comparator<Comparable<Object>> DEFAULT_COMPARATOR = new Comparator<Comparable<Object>>() {
+        @Override
+        public int compare(Comparable<Object> o1, Comparable<Object> o2) {
+            if (o1 == o2) { return 0; }
+            if (o1 == null) {
+                return - (o2.compareTo(o1));
+            }
+            return o1.compareTo(o2);
+        }
+    };
 
     @SuppressWarnings("unchecked")
-    static <T> Comparator<T> defaultComparator() { return (Comparator<T>) DEFAULT_COMPARATOR; }
+    public static <T> Comparator<T> defaultComparator() { return (Comparator<T>) DEFAULT_COMPARATOR; }
 
     /**
      Implement compare() and hash() and you get a 100% compatible eq() for free.
-    */
-    interface ComparisonContext<T> extends Equator<T>, Comparator<T> {
+     */
+    public static abstract class ComparisonContext<T> extends Equator<T> implements Comparator<T> {
         /** Returns true if the first object is less than the second. */
-        default boolean lt(T o1, T o2) { return compare(o1, o2) < 0; }
+        public boolean lt(T o1, T o2) { return compare(o1, o2) < 0; }
 
         /** Returns true if the first object is less than or equal to the second. */
-        default boolean lte(T o1, T o2) { return compare(o1, o2) <= 0; }
+        public boolean lte(T o1, T o2) { return compare(o1, o2) <= 0; }
 
         /** Returns true if the first object is greater than the second. */
-        default boolean gt(T o1, T o2) { return compare(o1, o2) > 0; }
+        public boolean gt(T o1, T o2) { return compare(o1, o2) > 0; }
 
         /** Returns true if the first object is greater than or equal to the second. */
-        default boolean gte(T o1, T o2) { return compare(o1, o2) >= 0; }
+        public boolean gte(T o1, T o2) { return compare(o1, o2) >= 0; }
 
-        @Override default boolean eq(T o1, T o2) { return compare(o1, o2) == 0; }
+        @Override public boolean eq(T o1, T o2) { return compare(o1, o2) == 0; }
 
-        ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT =
+        static final ComparisonContext<Comparable<Object>> DEFAULT_CONTEXT =
                 new ComparisonContext<Comparable<Object>>() {
-            @Override public int hash(Comparable<Object> o) {
-                return (o == null) ? 0 : o.hashCode();
-            }
-            @SuppressWarnings("ConstantConditions")
-            @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
-                if (o1 == o2) { return 0; }
-                if (o1 == null) {
-                    return - (o2.compareTo(o1));
-                }
-                return o1.compareTo(o2);
-            }
-        };
+                    @Override public int hash(Comparable<Object> o) {
+                        return (o == null) ? 0 : o.hashCode();
+                    }
+                    @SuppressWarnings("ConstantConditions")
+                    @Override public int compare(Comparable<Object> o1, Comparable<Object> o2) {
+                        if (o1 == o2) { return 0; }
+                        if (o1 == null) {
+                            return - (o2.compareTo(o1));
+                        }
+                        return o1.compareTo(o2);
+                    }
+                };
 
         @SuppressWarnings("unchecked")
         static <T> ComparisonContext<T> defCompCtx() {
@@ -110,13 +113,13 @@ public interface Equator<T> {
      reflect the new state.
      The name of this method is short so that auto-complete can offer it before hashCode().
      */
-    int hash(T t);
+    public abstract int hash(T t);
 
     /**
      Determines whether two objects are equal.  The name of this method is short so that
      auto-complete can offer it before equals().
      @return true if this Equator considers the two objects to be equal.
      */
-    boolean eq(T o1, T o2);
+    public abstract boolean eq(T o1, T o2);
 
 }

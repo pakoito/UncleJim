@@ -34,7 +34,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
      remember.
      */
     @Override default UnmodSortedSet<Entry<K,V>> entrySet() {
-        UnmodSortedMap<K,V> parentMap = this;
+        final UnmodSortedMap<K,V> parentMap = this;
         return new UnmodSortedSet<Entry<K,V>>() {
             @Override public int size() { return parentMap.size(); }
 
