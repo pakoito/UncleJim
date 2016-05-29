@@ -13,9 +13,9 @@
 // limitations under the License.
 package org.organicdesign.fp;
 
-import java.util.Objects;
-
 import org.organicdesign.fp.function.Function1;
+
+import java.util.Objects;
 
 /**
  `Or` represents the presence of a successful outcome, or an error.
@@ -33,17 +33,17 @@ import org.organicdesign.fp.function.Function1;
 
  Any errors are my own.
  */
-public interface Or<G,B> {
+public abstract class Or<G,B> {
     /** Returns true if this Or has a good value. */
-    boolean isGood();
+    public abstract boolean isGood();
     /** Returns true if this Or has a bad value. */
-    boolean isBad();
+    public abstract boolean isBad();
 
     /** Returns the good value if this is a Good, or throws an exception if this is a Bad. */
-    G good();
+    public abstract G good();
 
     /** Returns the bad value if this is a Bad, or throws an exception if this is a Good. */
-    B bad();
+    public abstract B bad();
 
     /** Construct a new Good from the given object. */
     static <G,B> Good<G,B> good(G good) { return new Good<>(good); }
@@ -66,12 +66,12 @@ public interface Or<G,B> {
         if (either == null) {
             throw new IllegalArgumentException("Can't handle a null either");
         }
-        return either.isGood() ? g.apply(either.good())
-                               : b.apply(either.bad());
+        return either.isGood() ? g.call(either.good())
+                               : b.call(either.bad());
     }
 
     /** Represents the presence of a Good value (and absence of a Bad). */
-    class Good<G,B> implements Or<G,B> {
+    private static class Good<G,B> extends Or<G,B> {
         private final G good;
         private Good(G r) { good = r; }
 
@@ -99,7 +99,7 @@ public interface Or<G,B> {
     }
 
     /** Represents the presence of a Bad value (and absence of a Good). */
-    class Bad<G,B> implements Or<G,B> {
+    private static class Bad<G,B> extends Or<G,B> {
         private final B bad;
         private Bad(B l) { bad = l; }
 

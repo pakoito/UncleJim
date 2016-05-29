@@ -223,7 +223,12 @@ public class FunctionUtils {
         return (UnmodIterator<T>) EMPTY_UNMOD_ITERATOR;
     }
 
-    static UnmodIterable<Object> EMPTY_UNMOD_ITERABLE = () -> emptyUnmodIterator();
+    static UnmodIterable<Object> EMPTY_UNMOD_ITERABLE = new UnmodIterable<Object>() {
+        @Override
+        public UnmodIterator<Object> iterator() {
+            return emptyUnmodIterator();
+        }
+    };
 
     @SuppressWarnings("unchecked")
     static <E> UnmodIterable<E> emptyUnmodIterable() {
@@ -231,26 +236,31 @@ public class FunctionUtils {
     }
 
     /** Returns an unmodifiable version of the given iterable. */
-    public static <T> UnmodIterable<T> unmodIterable(Iterable<T> iterable) {
+    public static <T> UnmodIterable<T> unmodIterable(final Iterable<T> iterable) {
         if (iterable == null) { return emptyUnmodIterable(); }
         if (iterable instanceof UnmodIterable) { return (UnmodIterable<T>) iterable; }
-        return () -> new UnmodIterator<T>() {
-            private final Iterator<T> iter = iterable.iterator();
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public T next() { return iter.next(); }
-            // Defining equals and hashcode makes no sense because can't call them without changing
-            // the iterator which both makes it useless, and changes the equals and hashcode
-            // results.
+        return new UnmodIterable<T>() {
+            @Override
+            public UnmodIterator<T> iterator() {
+                return new UnmodIterator<T>() {
+                    private final Iterator<T> iter = iterable.iterator();
+                    @Override public boolean hasNext() { return iter.hasNext(); }
+                    @Override public T next() { return iter.next(); }
+                    // Defining equals and hashcode makes no sense because can't call them without changing
+                    // the iterator which both makes it useless, and changes the equals and hashcode
+                    // results.
 //            @Override public int hashCode() { return iter.hashCode(); }
 //            @SuppressWarnings("EqualsWhichDoesntCheckParameterClass") // See Note above.
 //            @Override public boolean equals(Object o) { return iter.equals(o); }
+                };
+            }
         };
     }
 
     /** Returns an unmodifiable version of the given iterator. */
     // Never make this public.  We can't trust an iterator that we didn't get
     // brand new ourselves, because iterators are inherently unsafe to share.
-    private static <T> UnmodIterator<T> unmodIterator(Iterator<T> iter) {
+    private static <T> UnmodIterator<T> unmodIterator(final Iterator<T> iter) {
         if (iter == null) { return emptyUnmodIterator(); }
         if (iter instanceof UnmodIterator) { return (UnmodIterator<T>) iter; }
         return new UnmodIterator<T>() {
@@ -265,7 +275,7 @@ public class FunctionUtils {
         };
     }
 
-    public static UnmodListIterator<Object> EMPTY_UNMOD_LIST_ITERATOR =
+    public static final UnmodListIterator<Object> EMPTY_UNMOD_LIST_ITERATOR =
             new UnmodListIterator<Object>() {
         @Override public boolean hasNext() { return false; }
         @Override public Object next() { throw new NoSuchElementException(); }
@@ -282,7 +292,7 @@ public class FunctionUtils {
      Returns an unmodifiable version of the given listIterator.  This is private because sharing
      iterators is bad.
      */
-    private static <T> UnmodListIterator<T> unmodListIterator(ListIterator<T> iter) {
+    private static <T> UnmodListIterator<T> unmodListIterator(final ListIterator<T> iter) {
         if (iter == null) { return emptyUnmodListIterator(); }
         if (iter instanceof UnmodListIterator) { return (UnmodListIterator<T>) iter; }
         return new UnmodListIterator<T>() {
@@ -301,7 +311,7 @@ public class FunctionUtils {
     }
 
     /** The EMPTY list - a sentinel value for use in == comparisons. */
-    public static UnmodList<Object> EMPTY_UNMOD_LIST = new UnmodList<Object>() {
+    public static final UnmodList<Object> EMPTY_UNMOD_LIST = new UnmodList<Object>() {
         @Override public UnmodListIterator<Object> listIterator(int index) {
             return emptyUnmodListIterator();
         }
@@ -314,7 +324,7 @@ public class FunctionUtils {
     public static <T> UnmodList<T> emptyUnmodList() { return (UnmodList<T>) EMPTY_UNMOD_LIST; }
 
     /** Returns an unmodifiable version of the given list. */
-    public static <T> UnmodList<T> unmodList(List<T> inner) {
+    public static <T> UnmodList<T> unmodList(final List<T> inner) {
         if (inner == null) { return emptyUnmodList(); }
         if (inner instanceof UnmodList) { return (UnmodList<T>) inner; }
         if (inner.size() < 1) { return emptyUnmodList(); }
@@ -331,7 +341,7 @@ public class FunctionUtils {
                 return unmodListIterator(inner.listIterator());
             }
             @Override public UnmodSortedIterator<T> iterator() {
-                Iterator<T> iter = inner.iterator();
+                final Iterator<T> iter = inner.iterator();
                 return new UnmodSortedIterator<T>() {
                     @Override public boolean hasNext() { return iter.hasNext(); }
                     @Override public T next() { return iter.next(); }
@@ -340,7 +350,7 @@ public class FunctionUtils {
         };
     }
 
-    public static UnmodSet<Object> EMPTY_UNMOD_SET = new UnmodSet<Object>() {
+    public static final UnmodSet<Object> EMPTY_UNMOD_SET = new UnmodSet<Object>() {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
@@ -350,7 +360,7 @@ public class FunctionUtils {
     public static <T> UnmodSet<T> emptyUnmodSet() { return (UnmodSet<T>) EMPTY_UNMOD_SET; }
 
     /** Returns an unmodifiable version of the given set. */
-    public static <T> UnmodSet<T> unmodSet(Set<T> set) {
+    public static <T> UnmodSet<T> unmodSet(final Set<T> set) {
         if (set == null) { return emptyUnmodSet(); }
         if (set instanceof UnmodSet) { return (UnmodSet<T>) set; }
         if (set.size() < 1) { return emptyUnmodSet(); }
@@ -365,7 +375,7 @@ public class FunctionUtils {
         };
     }
 
-    public static UnmodSortedIterator<Object> EMPTY_UNMOD_SORTED_ITERATOR =
+    public static final UnmodSortedIterator<Object> EMPTY_UNMOD_SORTED_ITERATOR =
             new UnmodSortedIterator<Object>() {
         @Override public boolean hasNext() { return false; }
         @Override public Object next() { throw new NoSuchElementException(); }
@@ -375,7 +385,7 @@ public class FunctionUtils {
         return (UnmodSortedIterator<T>) EMPTY_UNMOD_SORTED_ITERATOR;
     }
 
-    public static UnmodSet<Object> EMPTY_UNMOD_SORTED_SET = new UnmodSortedSet<Object>() {
+    public static final UnmodSet<Object> EMPTY_UNMOD_SORTED_SET = new UnmodSortedSet<Object>() {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
@@ -397,7 +407,7 @@ public class FunctionUtils {
     }
 
     /** Returns an unmodifiable version of the given set. */
-    public static <T> UnmodSortedSet<T> unmodSortedSet(SortedSet<T> set) {
+    public static <T> UnmodSortedSet<T> unmodSortedSet(final SortedSet<T> set) {
         if (set == null) { return emptyUnmodSortedSet(); }
         if (set instanceof UnmodSortedSet) { return (UnmodSortedSet<T>) set; }
         if (set.size() < 1) { return emptyUnmodSortedSet(); }
@@ -448,7 +458,7 @@ public class FunctionUtils {
     public static <T,U> UnmodMap<T,U> emptyUnmodMap() { return (UnmodMap<T,U>) EMPTY_UNMOD_MAP; }
 
     /** Returns an unmodifiable version of the given map. */
-    public static <K,V> UnmodMap<K,V> unmodMap(Map<K,V> map) {
+    public static <K,V> UnmodMap<K,V> unmodMap(final Map<K,V> map) {
         if (map == null) { return emptyUnmodMap(); }
         if (map instanceof UnmodMap) { return (UnmodMap<K,V>) map; }
         if (map.size() < 1) { return emptyUnmodMap(); }
@@ -509,7 +519,7 @@ public class FunctionUtils {
     }
 
     /** Returns an unmodifiable version of the given sorted map. */
-    public static <K,V> UnmodSortedMap<K,V> unmodSortedMap(SortedMap<K,V> map) {
+    public static <K,V> UnmodSortedMap<K,V> unmodSortedMap(final SortedMap<K,V> map) {
         if (map == null) { return emptyUnmodSortedMap(); }
         if (map instanceof UnmodSortedMap) { return (UnmodSortedMap<K,V>) map; }
         if (map.size() < 1) { return emptyUnmodSortedMap(); }
@@ -597,7 +607,7 @@ public class FunctionUtils {
         };
     }
 
-    public static UnmodCollection<Object> EMPTY_UNMOD_COLLECTION = new UnmodCollection<Object>() {
+    public static final UnmodCollection<Object> EMPTY_UNMOD_COLLECTION = new UnmodCollection<Object>() {
         @Override public boolean contains(Object o) { return false; }
         @Override public int size() { return 0; }
         @Override public boolean isEmpty() { return true; }
@@ -616,7 +626,7 @@ public class FunctionUtils {
      call themselves equal to a Collection.
      */
     @Deprecated
-    static <T> UnmodCollection<T> unmodCollection(Collection<T> coll) {
+    static <T> UnmodCollection<T> unmodCollection(final Collection<T> coll) {
         if (coll == null) { return emptyUnmodCollection(); }
         if (coll instanceof UnmodCollection) { return (UnmodCollection<T>) coll; }
         if (coll.size() < 1) { return emptyUnmodCollection(); }

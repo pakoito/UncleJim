@@ -17,34 +17,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.organicdesign.fp.collections.ImList;
-import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.ImSet;
-import org.organicdesign.fp.collections.ImSortedMap;
-import org.organicdesign.fp.collections.ImSortedSet;
-import org.organicdesign.fp.collections.UnmodCollection;
-import org.organicdesign.fp.collections.UnmodList;
-import org.organicdesign.fp.collections.UnmodListTest;
-import org.organicdesign.fp.collections.UnmodMap;
-import org.organicdesign.fp.collections.UnmodSet;
-import org.organicdesign.fp.collections.UnmodSortedMap;
-import org.organicdesign.fp.collections.UnmodSortedSet;
+import org.organicdesign.fp.collections.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.*;
@@ -682,10 +659,16 @@ public class FunctionUtilsTest {
 
     @Test public void unSetSorted() {
         assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_SET, FunctionUtils.unmodSortedSet(null));
-        assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_SET,
-                     FunctionUtils.unmodSortedSet(Collections.emptySortedSet()));
+        // FIXME not on Java 7
+//        assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_SET,
+//                     FunctionUtils.unmodSortedSet(Collections.emptySortedSet()));
 
-        ImSortedSet<Integer> imSet = sortedSet((a, b) -> a - b, vec(1, 2, 3));
+        ImSortedSet<Integer> imSet = sortedSet(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer a, Integer b) {
+                return a - b;
+            }
+        }, vec(1, 2, 3));
         assertTrue(imSet == FunctionUtils.unmodSortedSet(imSet));
 
         UnmodSortedSet<Integer> ts = FunctionUtils.unmodSortedSet(new TreeSet<>(Arrays.asList(5, 4, 3)));
@@ -826,12 +809,19 @@ public class FunctionUtilsTest {
 
     @Test public void unMapSorted() {
         assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_MAP, FunctionUtils.unmodSortedMap(null));
-        assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_MAP,
-                     FunctionUtils.unmodSortedMap(Collections.emptySortedMap()));
+        // FIXME Collections#emptySortedMap() not on Java 7
+//        assertEquals(FunctionUtils.EMPTY_UNMOD_SORTED_MAP,
+//                     FunctionUtils.unmodSortedMap(Collections.emptySortedMap()));
 
-        ImSortedMap<Integer,String> imMap = sortedMap((a, b) -> a - b, vec(tup(1, ordinal(1)),
-                                                                           tup(2, ordinal(2)),
-                                                                           tup(3, ordinal(3))));
+        ImSortedMap<Integer,String> imMap = sortedMap(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer a, Integer b) {
+                return a - b;
+            }
+        }, StaticImports
+                .<Map.Entry<Integer, String>>vec(tup(1, ordinal(1)),
+                        tup(2, ordinal(2)),
+                        tup(3, ordinal(3))));
         assertTrue(imMap == FunctionUtils.unmodSortedMap(imMap));
 
         final UnmodSortedMap<Integer,String> ts;
