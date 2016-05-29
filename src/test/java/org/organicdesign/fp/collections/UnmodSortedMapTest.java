@@ -2,6 +2,10 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedCollection;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedMap;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedSet;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Collection;

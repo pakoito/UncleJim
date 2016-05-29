@@ -3,6 +3,7 @@ package org.organicdesign.fp.collections;
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.collections.interfaces.UnmodIterable;
 
 import java.util.Arrays;
 import java.util.HashSet;

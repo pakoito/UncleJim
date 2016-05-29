@@ -14,7 +14,7 @@
 
 package org.organicdesign.fp.tuple;
 
-import org.organicdesign.fp.collections.UnmodMap;
+import org.organicdesign.fp.collections.interfaces.UnmodMap;
 
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -24,7 +24,7 @@ import java.util.Objects;
  (there is no ImMap.ImEntry)).  Designed to let you easily create immutable subclasses (to give your
  data structures meaningful names) with correct equals(), hashCode(), and toString() methods.
  */
-public class Tuple2<A,B> implements Entry<A,B>, UnmodMap.UnEntry<A,B> {
+public class Tuple2<A,B> extends UnmodMap.UnEntry<A,B> implements Entry<A,B> {
     // Fields are protected so that sub-classes can make accessor methods with meaningful names.
     protected final A _1;
     protected final B _2;

@@ -1,4 +1,4 @@
-package org.organicdesign.fp.collections;
+package org.organicdesign.fp.collections.interfaces;
 
 import org.organicdesign.fp.Option;
 import org.organicdesign.fp.function.Function1;
@@ -81,44 +81,50 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
 //        };
 //    }
 
-    /**
-     This is correct, but O(n).  It also works regardless of the order of the items because
-     a + b = b + a, even when an overflow occurs.
-     */
-    static int hashCode(Iterable is) {
-        if (is == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
-//        System.out.println("hashCode for: " + is);
-        int ret = 0;
-        for (Object t : is) {
-            if (t != null) {
-//                System.out.println("\tt: " + t + " hashCode: " + t.hashCode());
-                ret = ret + t.hashCode();
-            }
+    final class Helpers {
+        private Helpers() {
+            // No instances
         }
-        return ret;
-    }
 
-    /** Computes a reasonable to-string. */
-    static String toString(String name, Iterable iterable) {
-        if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
-        if (iterable == null) {
-            throw new IllegalArgumentException("Can't have a null iteratable.");
+        /**
+         This is correct, but O(n).  It also works regardless of the order of the items because
+         a + b = b + a, even when an overflow occurs.
+         */
+        public static int hashCode(Iterable is) {
+            if (is == null) { throw new IllegalArgumentException("Can't have a null iteratable."); }
+    //        System.out.println("hashCode for: " + is);
+            int ret = 0;
+            for (Object t : is) {
+                if (t != null) {
+    //                System.out.println("\tt: " + t + " hashCode: " + t.hashCode());
+                    ret = ret + t.hashCode();
+                }
+            }
+            return ret;
         }
-        StringBuilder sB = new StringBuilder();
-        sB.append(name).append("(");
-        int i = 0;
-        Iterator iter = iterable.iterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            if (i > 0) { sB.append(","); }
-            if (i > 4) { break; }
-            sB.append(item);
-            i++;
+
+        /** Computes a reasonable to-string. */
+        public static String toString(String name, Iterable iterable) {
+            if (name == null) { throw new IllegalArgumentException("Can't have a null name."); }
+            if (iterable == null) {
+                throw new IllegalArgumentException("Can't have a null iteratable.");
+            }
+            StringBuilder sB = new StringBuilder();
+            sB.append(name).append("(");
+            int i = 0;
+            Iterator iter = iterable.iterator();
+            while (iter.hasNext()) {
+                Object item = iter.next();
+                if (i > 0) { sB.append(","); }
+                if (i > 4) { break; }
+                sB.append(item);
+                i++;
+            }
+            if (iter.hasNext()) {
+                sB.append("...");
+            }
+            return sB.append(")").toString();
         }
-        if (iter.hasNext()) {
-            sB.append("...");
-        }
-        return sB.append(")").toString();
     }
 
     // ================================== Inherited from Iterable ==================================

@@ -49,7 +49,7 @@ public class ImListTest {
 //                     p.toString());
 //    }
 
-    static class TestList<T> implements ImList<T> {
+    static class TestList<T> extends ImList<T> {
         static <T> List<T> dup(Collection<T> in) {
             List<T> out = new ArrayList<>();
             out.addAll(in);

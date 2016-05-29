@@ -5,7 +5,7 @@ import org.organicdesign.fp.collections.ImMap;
 import org.organicdesign.fp.collections.ImSortedMap;
 import org.organicdesign.fp.collections.PersistentHashMap;
 import org.organicdesign.fp.collections.PersistentTreeMap;
-import org.organicdesign.fp.collections.UnmodSortedIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterable;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Arrays;
@@ -82,8 +82,8 @@ public class TransformableTest {
     @Test public void testToMutableSortedSet() throws Exception {
         SortedSet<Integer> control = new TreeSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
         Transformable<Integer> trans = Xform.of(control);
-        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedSet(control),
-                                              UnmodSortedIterable.castFromSortedSet(trans.toMutableSortedSet((a, b) -> a - b))));
+        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.Helpers.castFromSortedSet(control),
+                                              UnmodSortedIterable.Helpers.castFromSortedSet(trans.toMutableSortedSet((a, b) -> a - b))));
     }
 
     @Test public void testToImSet() throws Exception {
@@ -100,7 +100,7 @@ public class TransformableTest {
         control.addAll(items);
         Transformable<Integer> trans = Xform.of(items);
         assertEquals(control, trans.toImSortedSet(comp));
-        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedSet(control),
+        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.Helpers.castFromSortedSet(control),
                                               trans.toImSortedSet(comp)));
     }
 

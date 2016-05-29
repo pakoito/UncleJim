@@ -1,6 +1,7 @@
 package org.organicdesign.fp.collections;
 
 import org.junit.Test;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterator;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,7 +13,7 @@ import java.util.TreeSet;
 import static org.junit.Assert.*;
 
 public class ImSortedSetTest {
-    static class TestSortSet<T> implements ImSortedSet<T> {
+    static class TestSortSet<T> extends ImSortedSet<T> {
         static <T> SortedSet<T> dup(SortedSet<T> in) {
             SortedSet<T> out = new TreeSet<>(in.comparator());
             out.addAll(in);

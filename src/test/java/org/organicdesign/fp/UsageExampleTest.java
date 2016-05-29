@@ -17,7 +17,7 @@ package org.organicdesign.fp;
 import org.junit.Test;
 import org.organicdesign.fp.collections.ImList;
 import org.organicdesign.fp.collections.ImMap;
-import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodIterable;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.tuple.Tuple2;
 import org.organicdesign.fp.tuple.Tuple3;

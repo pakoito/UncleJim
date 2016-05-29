@@ -16,6 +16,8 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.collections.interfaces.UnmodIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodMap;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Arrays;
@@ -298,7 +300,7 @@ public class UnmodMapTest {
         }
     }
 
-    static class TestUnEntry<K,V> implements UnmodMap.UnEntry<K,V> {
+    static class TestUnEntry<K,V> extends UnmodMap.UnEntry<K,V> {
         private final K key;
         private final V value;
 

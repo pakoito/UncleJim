@@ -13,19 +13,25 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedSet;
+
 import java.util.Comparator;
 
 /** An immutable sorted set interface */
-public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E> {
+public abstract class ImSortedSet<E> implements ImSet<E>, UnmodSortedSet<E> {
     /** {@inheritDoc} */
-    @Override ImSortedSet<E> put(E e);
+    @Override
+    public abstract ImSortedSet<E> put(E e);
 
     /** {@inheritDoc} */
-    @Override ImSortedSet<E> without(E key);
+    @Override
+    public abstract ImSortedSet<E> without(E key);
 
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
-    @Override default ImSortedSet<E> headSet(E toElement) {
+    @Override
+    public ImSortedSet<E> headSet(E toElement) {
         Comparator<? super E> comparator = comparator();
         if (comparator == null) {
             // By the rules of the constructor type signature, we either need a comparator,
@@ -45,7 +51,8 @@ public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E> {
     /**
      Iterates over contents in a guaranteed order. {@inheritDoc}
      */
-    @Override UnmodSortedIterator<E> iterator();
+    @Override
+    public abstract UnmodSortedIterator<E> iterator();
 
 //    /**
 //     * This method goes against Josh Bloch's Item 25: "Prefer Lists to Arrays", but is provided for
@@ -61,15 +68,18 @@ public interface ImSortedSet<E> extends ImSet<E>, UnmodSortedSet<E> {
      Return the elements in this set from the start element (inclusive) to the end element
      (exclusive)
      */
-    @Override ImSortedSet<E> subSet(E fromElement, E toElement);
+    @Override
+    public abstract ImSortedSet<E> subSet(E fromElement, E toElement);
 
     /** {@inheritDoc} */
     // Note: there is no simple default implementation because subSet() is exclusive of the given
     // end element and there is no way to reliably find an element exactly larger than last().
     // Otherwise we could just return subSet(fromElement, last());
-    @Override ImSortedSet<E> tailSet(E fromElement);
+    @Override
+    public abstract ImSortedSet<E> tailSet(E fromElement);
 
-    @Override default ImSortedSet<E> union(Iterable<? extends E> iter) {
+    @Override
+    public ImSortedSet<E> union(Iterable<? extends E> iter) {
         ImSortedSet<E> ret = this;
         for (E e : iter) {
             if (!ret.contains(e)) { ret = ret.put(e); }

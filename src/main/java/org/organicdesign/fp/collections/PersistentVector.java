@@ -11,6 +11,10 @@
 /* rich Jul 5, 2007 */
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.collections.interfaces.UnmodIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodListIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterable;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,7 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
  @author Rich Hickey (Primary author)
  @author Glen Peterson (Java-centric editor)
  */
-public class PersistentVector<E> implements ImList<E> {
+public class PersistentVector<E> extends ImList<E> {
 
     // There's bit shifting going on here because it's a very fast operation.
     // Shifting right by 5 is aeons faster than dividing by 32.
@@ -426,11 +430,11 @@ public class PersistentVector<E> implements ImList<E> {
         if ( !(other instanceof List) ) { return false; }
         List that = (List) other;
         return (this.size() == that.size()) &&
-                UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromList(that));
+                UnmodSortedIterable.equals(this, Helpers.castFromList(that));
     }
 
     @Override public String toString() {
-        return UnmodIterable.toString("PersistentVector", this);
+        return UnmodIterable.Helpers.toString("PersistentVector", this);
     }
 
     private static Node doAssoc(int level, Node node, int i, Object val) {

@@ -13,6 +13,8 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.collections.interfaces.UnmodSet;
+
 /** An immutable set interface */
 public interface ImSet<E> extends UnmodSet<E> {
     /**

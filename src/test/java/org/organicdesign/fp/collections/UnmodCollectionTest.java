@@ -16,6 +16,8 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.collections.interfaces.UnmodCollection;
+import org.organicdesign.fp.collections.interfaces.UnmodIterator;
 
 import java.util.ArrayList;
 import java.util.Arrays;

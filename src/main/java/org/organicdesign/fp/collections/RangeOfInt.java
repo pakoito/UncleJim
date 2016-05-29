@@ -13,6 +13,11 @@
 
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.collections.interfaces.UnmodIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodList;
+import org.organicdesign.fp.collections.interfaces.UnmodListIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterable;
+
 import java.math.BigInteger;
 import java.util.List;
 
@@ -40,7 +45,7 @@ public class RangeOfInt implements UnmodList<Integer> {
          a range.
          */
         @Override public int hash(List<Integer> integers) {
-            return UnmodIterable.hashCode(integers);
+            return UnmodIterable.Helpers.hashCode(integers);
         }
 
         @Override
@@ -51,8 +56,8 @@ public class RangeOfInt implements UnmodList<Integer> {
                 return o1.equals(o2);
             }
             return o1.size() == o2.size() &&
-                   UnmodSortedIterable.equals(UnmodSortedIterable.castFromList(o1),
-                                              UnmodSortedIterable.castFromList(o2));
+                   UnmodSortedIterable.equals(Helpers.castFromList(o1),
+                                              Helpers.castFromList(o2));
         }
     };
 

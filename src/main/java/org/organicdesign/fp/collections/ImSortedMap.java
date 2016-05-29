@@ -14,13 +14,16 @@
 package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.collections.interfaces.UnmodMap;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedMap;
 
 import java.util.Map;
 
 /** An immutable sorted map. */
-public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V> {
+public abstract class ImSortedMap<K,V> implements UnmodSortedMap<K,V> {
 
-    Option<UnmodMap.UnEntry<K,V>> entry(K key);
+    public abstract Option<UnmodMap.UnEntry<K,V>> entry(K key);
 
 //    /**
 //     Returns a view of the mappings contained in this map.  The set should actually contain
@@ -32,31 +35,35 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V> {
 // public  K	firstKey()
 
     @SuppressWarnings("unchecked")
-    @Override default boolean containsKey(Object key) { return entry((K) key).isSome(); }
+    @Override
+    public boolean containsKey(Object key) { return entry((K) key).isSome(); }
 
     @SuppressWarnings("unchecked")
-    @Override default V get(Object key) {
+    @Override
+    public V get(Object key) {
         Option<UnEntry<K,V>> entry = entry((K) key);
         return entry.isSome() ? entry.get().getValue() : null;
     }
 
-    default V getOrElse(K key, V notFound) {
+    public V getOrElse(K key, V notFound) {
         Option<UnEntry<K,V>> entry = entry(key);
         return entry.isSome() ? entry.get().getValue() : notFound;
     }
 
     /** Return the elements in this map up (but excluding) to the given element */
-    @Override default ImSortedMap<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
+    @Override
+    public ImSortedMap<K,V> headMap(K toKey) { return subMap(firstKey(), toKey); }
 
     /**
      Returns an iterator over the UnEntries of this map in order.
      @return an Iterator.
      */
     @Override
-    UnmodSortedIterator<UnEntry<K, V>> iterator();
+    public abstract UnmodSortedIterator<UnEntry<K, V>> iterator();
 
     /** Returns a view of the keys contained in this map. */
-    @Override default ImSortedSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
+    @Override
+    public ImSortedSet<K> keySet() { return PersistentTreeSet.ofMap(this); }
 
 // public  K	lastKey()
 
@@ -65,11 +72,11 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V> {
      (exclusive)
      */
     @Override
-    ImSortedMap<K,V> subMap(K fromKey, K toKey);
+    public abstract ImSortedMap<K,V> subMap(K fromKey, K toKey);
 
     /** Return the elements in this from the given element to the end */
     @Override
-    ImSortedMap<K,V> tailMap(K fromKey);
+    public abstract ImSortedMap<K,V> tailMap(K fromKey);
 
 //    /** {@inheritDoc} */
 //    @Override default UnmodSortedCollection<V> values() {
@@ -118,13 +125,13 @@ public interface ImSortedMap<K,V> extends UnmodSortedMap<K,V> {
      @return a new PersistentTreeMap of the specified comparator and the given key/value pairs
 
      */
-    ImSortedMap<K,V> assoc(K key, V val);
+    public abstract ImSortedMap<K,V> assoc(K key, V val);
 
     /** Returns a new map with an immutable copy of the given entry added */
-    default ImSortedMap<K,V> assoc(Map.Entry<K,V> entry) {
+    public ImSortedMap<K,V> assoc(Map.Entry<K, V> entry) {
         return assoc(entry.getKey(), entry.getValue());
     }
 
     /** Returns a new map with the given key/value removed */
-    ImSortedMap<K,V> without(K key);
+    public abstract ImSortedMap<K,V> without(K key);
 }

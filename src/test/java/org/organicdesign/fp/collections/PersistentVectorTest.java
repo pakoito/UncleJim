@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.collections.interfaces.UnmodMap;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;

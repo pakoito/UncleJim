@@ -1,6 +1,7 @@
 package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.collections.interfaces.UnmodMap;
 
 import java.util.Map;
 

@@ -10,6 +10,10 @@
 package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.collections.interfaces.UnmodIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodMap;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterator;
 
 import java.util.Comparator;
 import java.util.SortedSet;
@@ -20,7 +24,7 @@ import java.util.SortedSet;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
  */
-public class PersistentTreeSet<E> implements ImSortedSet<E> {
+public class PersistentTreeSet<E> extends ImSortedSet<E> {
 
     /**
      Be extremely careful with this because it uses the default comparator, which only works for items that implement
@@ -144,7 +148,7 @@ public class PersistentTreeSet<E> implements ImSortedSet<E> {
         SortedSet that = ((SortedSet) other);
 
         if (size() != that.size()) { return false; }
-        return UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromSortedSet(that));
+        return UnmodSortedIterable.equals(this, Helpers.castFromSortedSet(that));
     }
 
     /**
@@ -159,7 +163,7 @@ public class PersistentTreeSet<E> implements ImSortedSet<E> {
     @Override public E first() { return impl.firstKey(); }
 
     /** {@inheritDoc} */
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.hashCode(this); }
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.Helpers.hashCode(this); }
 
     /** {@inheritDoc} */
     @Override public Option<E> head() { return size() > 0 ? Option.of(impl.firstKey()) : Option.none(); }
@@ -197,7 +201,7 @@ public class PersistentTreeSet<E> implements ImSortedSet<E> {
 //    @Override public Sequence<E> tail() { return impl.without(first()).keySet().seq(); }
 
     /** Returns a string representation of this set. */
-    @Override public String toString() { return UnmodIterable.toString("PersistentTreeSet", this); }
+    @Override public String toString() { return UnmodIterable.Helpers.toString("PersistentTreeSet", this); }
 
 //    @Override
 //    public ISeq<E> rseq() {

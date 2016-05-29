@@ -9,6 +9,7 @@
 package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.collections.interfaces.*;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,7 +32,7 @@ import java.util.Stack;
  @author Glen Peterson (Java-centric editor)
  */
 
-public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
+public class PersistentTreeMap<K,V> extends ImSortedMap<K,V> {
 
     // TODO: Replace with Mutable.Ref, or make methods return Tuple2.
     private class Box<E> {
@@ -135,19 +136,19 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
     }
 
     /** This is correct, but O(n). */
-    @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.hashCode(entrySet()); }
+    @Override public int hashCode() { return (size() == 0) ? 0 : UnmodIterable.Helpers.hashCode(entrySet()); }
 
     public static final Equator<SortedMap> EQUATOR = new Equator<SortedMap>() {
         @Override
         public int hash(SortedMap kvSortedMap) {
-            return UnmodIterable.hashCode(kvSortedMap.entrySet());
+            return UnmodIterable.Helpers.hashCode(kvSortedMap.entrySet());
         }
 
         @Override
         public boolean eq(SortedMap o1, SortedMap o2) {
             if (o1 == o2) { return true; }
             if ( o1.size() != o2.size() ) { return false; }
-            return UnmodSortedIterable.equals(UnmodSortedIterable.castFromSortedMap(o1), UnmodSortedIterable.castFromSortedMap(o2));
+            return UnmodSortedIterable.equals(Helpers.castFromSortedMap(o1), Helpers.castFromSortedMap(o2));
         }
     };
 
@@ -172,7 +173,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
         // Yay, this makes sense, and we can compare these with O(n) efficiency while still maintaining compatibility
         // with java.util.Map.
         if (other instanceof SortedMap) {
-            return UnmodSortedIterable.equals(this, UnmodSortedIterable.castFromSortedMap((SortedMap) other));
+            return UnmodSortedIterable.equals(this, Helpers.castFromSortedMap((SortedMap) other));
         }
 
         // This makes no sense and takes O(n log n) or something.
@@ -747,7 +748,7 @@ public class PersistentTreeMap<K,V> implements ImSortedMap<K,V> {
 //        private Reduced(A a) { val = a; }
 //    }
 
-    private static abstract class Node<K, V> implements UnEntry<K,V> {
+    private static abstract class Node<K, V> extends UnEntry<K,V> {
         final K key;
 
         Node(K key) { this.key = key; }

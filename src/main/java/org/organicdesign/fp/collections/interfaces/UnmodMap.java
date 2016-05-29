@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.organicdesign.fp.collections;
+package org.organicdesign.fp.collections.interfaces;
 
 import org.organicdesign.fp.tuple.Tuple2;
 
@@ -37,25 +37,26 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
      *
      * @see UnmodMap#entrySet()
      */
-    interface UnEntry<K,V> extends Map.Entry<K,V> {
-        /** Not allowed - this is supposed to be unmodifiable */
-        @SuppressWarnings("deprecation")
-        @Override @Deprecated default V setValue(V value) {
-            throw new UnsupportedOperationException("Modification attempted");
-        }
-
-        static <K,V> UnEntry<K,V> entryToUnEntry(Map.Entry<K,V> entry) {
+    abstract class UnEntry<K,V> implements Entry<K,V> {
+        public static <K,V> UnEntry<K,V> entryToUnEntry(Entry<K, V> entry) {
             return Tuple2.of(entry.getKey(), entry.getValue());
         }
 
-        static <K,V>
-        UnmodIterator<UnEntry<K,V>> entryIterToUnEntryUnIter(Iterator<Entry<K,V>> innerIter) {
+        public static <K,V>
+        UnmodIterator<UnEntry<K,V>> entryIterToUnEntryUnIter(final Iterator<Entry<K, V>> innerIter) {
             return new UnmodIterator<UnEntry<K, V>>() {
                 @Override public boolean hasNext() { return innerIter.hasNext(); }
                 @Override public UnEntry<K, V> next() {
-                    return UnmodMap.UnEntry.entryToUnEntry(innerIter.next());
+                    return entryToUnEntry(innerIter.next());
                 }
             };
+        }
+
+        /** Not allowed - this is supposed to be unmodifiable */
+        @SuppressWarnings("deprecation")
+        @Override @Deprecated
+        public V setValue(V value) {
+            throw new UnsupportedOperationException("Modification attempted");
         }
 
         // This should be done with a cast, not with code.
@@ -176,7 +177,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             @Override public int size() { return parent.size(); }
 
             @Override public String toString() {
-                return UnmodIterable.toString("UnmodMap.entrySet", this);
+                return Helpers.toString("UnmodMap.entrySet", this);
             }
         };
     }
@@ -235,7 +236,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             @Override public int size() { return parent.size(); }
 
             @Override public String toString() {
-                return UnmodIterable.toString("UnmodMap.keySet", this);
+                return Helpers.toString("UnmodMap.keySet", this);
             }
         };
     }
@@ -330,7 +331,7 @@ public interface UnmodMap<K,V> extends Map<K,V>, UnmodIterable<UnmodMap.UnEntry<
             @Override public int size() { return parent.size(); }
 
             @Override public String toString() {
-                return UnmodIterable.toString("UnmodMap.values", this);
+                return Helpers.toString("UnmodMap.values", this);
             }
         };
     }

@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.organicdesign.fp.collections;
+package org.organicdesign.fp.collections.interfaces;
 
 import java.util.Collection;
 import java.util.Set;
@@ -35,7 +35,7 @@ public interface UnmodSet<E> extends UnmodCollection<E>, Set<E> {
                    containsAll(that);
         }
 
-        @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+        @Override public int hashCode() { return Helpers.hashCode(this); }
     }
 
     // ========================================= Instance =========================================

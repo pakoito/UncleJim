@@ -1,4 +1,4 @@
-package org.organicdesign.fp.collections;
+package org.organicdesign.fp.collections.interfaces;
 
 import java.util.Iterator;
 import java.util.List;
@@ -13,22 +13,52 @@ import java.util.SortedSet;
 public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
     // ==================================================== Static ====================================================
 
-    /** This is correct, but O(n).  This only works with an ordered iterable. */
-    static boolean equals(UnmodSortedIterable a, UnmodSortedIterable b) {
-        // Cheapest operation first...
-        if (a == b) { return true; }
-
-        if ((a == null) || (b == null)) {
-            return false;
+    final class Helpers {
+        private Helpers() {
+            // No instances
         }
-        Iterator as = a.iterator();
-        Iterator bs = b.iterator();
-        while (as.hasNext() && bs.hasNext()) {
-            if (!Objects.equals(as.next(), bs.next())) {
+
+        public static UnmodSortedIterable castFromSortedSet(SortedSet ss) {
+            return () -> new UnmodSortedIterator() {
+                Iterator iter = ss.iterator();
+                @Override public boolean hasNext() { return iter.hasNext(); }
+                @Override public Object next() { return iter.next(); }
+            };
+        }
+
+        public static UnmodSortedIterable castFromList(List ss) {
+            return () -> new UnmodSortedIterator() {
+                Iterator iter = ss.iterator();
+                @Override public boolean hasNext() { return iter.hasNext(); }
+                @Override public Object next() { return iter.next(); }
+            };
+        }
+
+        public static UnmodSortedIterable castFromSortedMap(final SortedMap sm) {
+            return () -> new UnmodSortedIterator() {
+                Iterator iter = sm.entrySet().iterator();
+                @Override public boolean hasNext() { return iter.hasNext(); }
+                @Override public Object next() { return iter.next(); }
+            };
+        }
+
+        /** This is correct, but O(n).  This only works with an ordered iterable. */
+        static boolean equals(UnmodSortedIterable a, UnmodSortedIterable b) {
+            // Cheapest operation first...
+            if (a == b) { return true; }
+
+            if ((a == null) || (b == null)) {
                 return false;
             }
+            Iterator as = a.iterator();
+            Iterator bs = b.iterator();
+            while (as.hasNext() && bs.hasNext()) {
+                if (!Objects.equals(as.next(), bs.next())) {
+                    return false;
+                }
+            }
+            return !as.hasNext() && !bs.hasNext();
         }
-        return !as.hasNext() && !bs.hasNext();
     }
 
     //    static <E> UnmodSortedIterable<E> castFromSortedSet(SortedSet<E> ss) {
@@ -39,15 +69,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 //        };
 //    }
 
-    static UnmodSortedIterable castFromSortedSet(SortedSet ss) {
-        return () -> new UnmodSortedIterator() {
-            Iterator iter = ss.iterator();
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public Object next() { return iter.next(); }
-        };
-    }
-
-//    static <E> UnmodSortedIterable<E> castFromList(List<E> ss) {
+    //    static <E> UnmodSortedIterable<E> castFromList(List<E> ss) {
 //        return () -> new UnmodSortedIterator<E>() {
 //            Iterator<E> iter = ss.iterator();
 //            @Override public boolean hasNext() { return iter.hasNext(); }
@@ -55,15 +77,7 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 //        };
 //    }
 
-    static UnmodSortedIterable castFromList(List ss) {
-        return () -> new UnmodSortedIterator() {
-            Iterator iter = ss.iterator();
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public Object next() { return iter.next(); }
-        };
-    }
-
-//    static <U> UnmodSortedIterable<U> castFromTypedList(List<U> ss) {
+    //    static <U> UnmodSortedIterable<U> castFromTypedList(List<U> ss) {
 //        return () -> new UnmodSortedIterator<U>() {
 //            Iterator<U> iter = ss.iterator();
 //            @Override public boolean hasNext() { return iter.hasNext(); }
@@ -86,14 +100,6 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
 //            @Override public Map.Entry<K,V> next() { return iter.next(); }
 //        };
 //    }
-
-    static UnmodSortedIterable castFromSortedMap(SortedMap sm) {
-        return () -> new UnmodSortedIterator() {
-            Iterator iter = sm.entrySet().iterator();
-            @Override public boolean hasNext() { return iter.hasNext(); }
-            @Override public Object next() { return iter.next(); }
-        };
-    }
 
     // =================================================== Instance ===================================================
     /** Returns items in a guaranteed order. */

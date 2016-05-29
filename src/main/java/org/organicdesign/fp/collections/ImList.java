@@ -13,11 +13,13 @@
 // limitations under the License.
 package org.organicdesign.fp.collections;
 
+import org.organicdesign.fp.collections.interfaces.UnmodList;
+
 /**
  Holds Immutable "modification" methods that return a new ImList reflecting the modification while
  sharing as much data structure with the previous ImList as possible (for performance).
  */
-public interface ImList<E> extends UnmodList<E> {
+public abstract class ImList<E> implements UnmodList<E> {
 // Inherited correctly - there is no ImIterator.
 // UnmodSortedIterator<E> iterator();
 // UnmodListIterator<E> listIterator(int index);
@@ -123,7 +125,7 @@ public interface ImList<E> extends UnmodList<E> {
      @param e the value to insert
      @return a new ImList with the additional item at the end.
      */
-    ImList<E> append(E e);
+    public abstract ImList<E> append(E e);
 
     /**
      Adds multiple items to the end of the ImList.
@@ -131,7 +133,8 @@ public interface ImList<E> extends UnmodList<E> {
      @param es the values to insert
      @return a new ImList with the additional items at the end.
      */
-    @Override default ImList<E> concat(Iterable<? extends E> es) {
+    @Override
+    public ImList<E> concat(Iterable<? extends E> es) {
         ImList<E> result = this;
         for (E e : es) {
             result = result.append(e);
@@ -182,7 +185,7 @@ public interface ImList<E> extends UnmodList<E> {
      * @param notFound the value to return if the index is out of bounds.
      * @return the value at that index, or the notFound value.
      */
-    default E get(int i, E notFound) {
+    public E get(int i, E notFound) {
         if (i >= 0 && i < size())
             return get(i);
         return notFound;
@@ -197,7 +200,7 @@ public interface ImList<E> extends UnmodList<E> {
      @return a new ImList with the replaced item
      */
     // TODO: Don't make i.replace(i.size(), o) equivalent to i.concat(o)
-    ImList<E> replace(int idx, E e);
+    public abstract ImList<E> replace(int idx, E e);
 
     // ====================================== STATIC METHODS ======================================
 //    static <T> ImList<T> empty() { return PersistentVector.empty(); }

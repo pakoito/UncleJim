@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.organicdesign.fp.collections;
+package org.organicdesign.fp.collections.interfaces;
 
 import org.organicdesign.fp.function.Function2;
 
@@ -31,14 +31,20 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 
     // ========================================== Static ==========================================
 
-    /**
-     Apply the given function against all unique pairings of items in the list.  Does this belong on
-     Function2 instead of List?
-     */
-    static <T> void permutations(List<T> items, Function2<? super T,? super T,?> f) {
-        for (int i = 0; i < items.size(); i++) {
-            for (int j = i + 1; j < items.size(); j++) {
-                f.call(items.get(i), items.get(j));
+    final class Helpers {
+        private Helpers() {
+            // No instances
+        }
+
+        /**
+         Apply the given function against all unique pairings of items in the list.  Does this belong on
+         Function2 instead of List?
+         */
+        public static <T> void permutations(List<T> items, Function2<? super T, ? super T, ?> f) {
+            for (int i = 0; i < items.size(); i++) {
+                for (int j = i + 1; j < items.size(); j++) {
+                    f.call(items.get(i), items.get(j));
+                }
             }
         }
     }
@@ -138,7 +144,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
     @Override default UnmodListIterator<E> listIterator() { return listIterator(0); }
 
     /** {@inheritDoc}  Subclasses should override this when they can do so more efficiently. */
-    @Override default UnmodListIterator<E> listIterator(int index) {
+    @Override default UnmodListIterator<E> listIterator(final int index) {
         if ( (index < 0) || (index >= size()) ) {
             throw new IndexOutOfBoundsException("Expected an index between 0 and " + size() +
                                                 " but found: " + index);

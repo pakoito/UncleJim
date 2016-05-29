@@ -11,8 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package org.organicdesign.fp.collections;
+package org.organicdesign.fp.collections.interfaces;
 
+import org.organicdesign.fp.collections.Equator;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Comparator;
@@ -91,7 +92,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 return Tuple2.of(key, parentMap.get(key));
             }
 
-            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+            @Override public int hashCode() { return UnmodIterable.Helpers.hashCode(this); }
 
             @SuppressWarnings("unchecked")
             @Override public boolean equals(Object o) {
@@ -134,7 +135,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
             }
 
             @Override public String toString() {
-                return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
+                return UnmodIterable.Helpers.toString("UnmodSortedMap.entrySet", this);
             }
         };
     }
@@ -188,7 +189,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 return parentMap.lastKey();
             }
 
-            @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+            @Override public int hashCode() { return UnmodIterable.Helpers.hashCode(this); }
 
             @SuppressWarnings("unchecked")
             @Override public boolean equals(Object o) {
@@ -240,7 +241,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
                 return !as.hasNext() && !bs.hasNext();
             }
             @Override public String toString() {
-                return UnmodIterable.toString("UnmodSortedMap.entrySet", this);
+                return UnmodIterable.Helpers.toString("UnmodSortedMap.entrySet", this);
             }
 
         };

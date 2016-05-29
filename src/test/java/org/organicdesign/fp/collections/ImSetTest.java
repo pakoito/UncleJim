@@ -1,6 +1,7 @@
 package org.organicdesign.fp.collections;
 
 import org.junit.Test;
+import org.organicdesign.fp.collections.interfaces.UnmodIterator;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -59,7 +60,7 @@ public class ImSetTest {
                    containsAll(that);
         }
 
-        @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+        @Override public int hashCode() { return Helpers.hashCode(this); }
     }
 
     @Test public void testUnion() {

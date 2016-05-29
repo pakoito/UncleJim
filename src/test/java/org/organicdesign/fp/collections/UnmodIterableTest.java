@@ -4,6 +4,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.collections.interfaces.UnmodIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,11 +88,11 @@ public class UnmodIterableTest {
             @Override public Integer next() { return intern.next(); }
         };
 
-        assertEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(a));
-        assertEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(b));
-        assertNotEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(c));
+        assertEquals(UnmodIterable.Helpers.hashCode(a), UnmodIterable.Helpers.hashCode(a));
+        assertEquals(UnmodIterable.Helpers.hashCode(a), UnmodIterable.Helpers.hashCode(b));
+        assertNotEquals(UnmodIterable.Helpers.hashCode(a), UnmodIterable.Helpers.hashCode(c));
 
-        assertEquals(0, UnmodIterable.hashCode(Arrays.asList(new String[] { null })));
+        assertEquals(0, UnmodIterable.Helpers.hashCode(Arrays.asList(new String[] { null })));
 
         assertTrue(UnmodSortedIterable.equals(a, a));
         assertTrue(UnmodSortedIterable.equals(a, b));
@@ -122,10 +126,10 @@ public class UnmodIterableTest {
             @Override public Integer next() { return intern.next(); }
         };
 
-        assertEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(a));
-        assertEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(b));
-        assertNotEquals(UnmodIterable.hashCode(a), UnmodIterable.hashCode(c));
-        assertNotEquals(UnmodIterable.hashCode(b), UnmodIterable.hashCode(d));
+        assertEquals(UnmodIterable.Helpers.hashCode(a), UnmodIterable.Helpers.hashCode(a));
+        assertEquals(UnmodIterable.Helpers.hashCode(a), UnmodIterable.Helpers.hashCode(b));
+        assertNotEquals(UnmodIterable.Helpers.hashCode(a), UnmodIterable.Helpers.hashCode(c));
+        assertNotEquals(UnmodIterable.Helpers.hashCode(b), UnmodIterable.Helpers.hashCode(d));
 
         assertTrue(UnmodSortedIterable.equals(a, a));
         assertTrue(UnmodSortedIterable.equals(a, b));
@@ -138,15 +142,15 @@ public class UnmodIterableTest {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test (expected = IllegalArgumentException.class)
-    public void testEx01() { UnmodIterable.hashCode(null); }
+    public void testEx01() { UnmodIterable.Helpers.hashCode(null); }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test (expected = IllegalArgumentException.class)
-    public void testEx02() { UnmodIterable.toString(null, Arrays.asList(1,2,3)); }
+    public void testEx02() { UnmodIterable.Helpers.toString(null, Arrays.asList(1,2,3)); }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test (expected = IllegalArgumentException.class)
-    public void testEx03() { UnmodIterable.toString("Oops", null); }
+    public void testEx03() { UnmodIterable.Helpers.toString("Oops", null); }
 
 //    @Test public void compareHelper() {
 //        UnmodIterable<Integer> a = () -> new UnmodIterator<Integer>() {

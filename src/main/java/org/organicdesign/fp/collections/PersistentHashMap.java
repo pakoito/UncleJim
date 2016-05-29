@@ -12,6 +12,9 @@ package org.organicdesign.fp.collections;
 
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.collections.interfaces.UnmodIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodMap;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.io.Serializable;
@@ -34,7 +37,7 @@ import static org.organicdesign.fp.FunctionUtils.emptyUnmodIterator;
  This file is a derivative work based on a Clojure collection licensed under the Eclipse Public
  License 1.0 Copyright Rich Hickey
  */
-public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
+public class PersistentHashMap<K,V> extends ImMapTrans<K,V> {
 
 //    static private <K, V, R> R doKvreduce(Object[] array, Function3<R,K,V,R> f, R init) {
 //        for (int i = 0; i < array.length; i += 2) {
@@ -236,7 +239,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         return true;
     }
 
-    @Override public int hashCode() { return UnmodIterable.hashCode(this); }
+    @Override public int hashCode() { return Helpers.hashCode(this); }
 
     // This is cut and pasted exactly to the Transient version of this class below.
     @Override public UnmodIterator<UnEntry<K,V>> iterator() {
@@ -309,7 +312,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
     @Override public int size() { return count; }
 
     /** {@inheritDoc} */
-    @Override public String toString() { return UnmodIterable.toString("PersistentHashMap", this); }
+    @Override public String toString() { return Helpers.toString("PersistentHashMap", this); }
 
     @SuppressWarnings("unchecked")
     @Override public PersistentHashMap<K,V> without(K key){
@@ -323,7 +326,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         return new PersistentHashMap<>(equator, count - 1, newroot, hasNull, nullValue);
     }
 
-    static final class TransientHashMap<K,V> implements ImMapTrans<K,V> {
+    static final class TransientHashMap<K,V> extends ImMapTrans<K,V> {
         private AtomicReference<Thread> edit;
         private final Equator<K> equator;
         private INode<K,V> root;
@@ -339,7 +342,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
 
         TransientHashMap(Equator<K> e, AtomicReference<Thread> edit, INode<K,V> root, int count,
                          boolean hasNull, V nullValue) {
-            this.equator = (e == null) ? Equator.defaultEquator() : e;
+            this.equator = (e == null) ? Equator.<K>defaultEquator() : e;
             this.edit = edit;
             this.root = root;
             this.count = count;
@@ -675,7 +678,7 @@ public class PersistentHashMap<K,V> implements ImMapTrans<K,V> {
         }
 
         @Override public String toString() {
-            return UnmodIterable.toString("ArrayNode", this);
+            return Helpers.toString("ArrayNode", this);
         }
 
         static class Iter<K,V> implements UnmodIterator<UnEntry<K,V>> {

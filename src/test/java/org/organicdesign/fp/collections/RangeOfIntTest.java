@@ -1,6 +1,8 @@
 package org.organicdesign.fp.collections;
 
 import org.junit.Test;
+import org.organicdesign.fp.collections.interfaces.UnmodListIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterable;
 import org.organicdesign.testUtils.EqualsContract;
 
 import java.math.BigInteger;
@@ -200,8 +202,8 @@ public class RangeOfIntTest {
                      LIST_EQUATOR.hash(b));
         assertEquals(a.size(), b.size());
 
-        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.castFromList(a),
-                                              UnmodSortedIterable.castFromList(b)));
+        assertTrue(UnmodSortedIterable.equals(UnmodSortedIterable.Helpers.castFromList(a),
+                                              UnmodSortedIterable.Helpers.castFromList(b)));
 
         assertTrue("List and range are equal", LIST_EQUATOR.eq(a, b));
 

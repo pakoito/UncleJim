@@ -20,6 +20,9 @@ import org.junit.runners.JUnit4;
 import org.organicdesign.fp.FunctionUtils;
 import org.organicdesign.fp.FunctionUtilsTest;
 import org.organicdesign.fp.Option;
+import org.organicdesign.fp.collections.interfaces.UnmodIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodMap;
 import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.tuple.Tuple2;
 

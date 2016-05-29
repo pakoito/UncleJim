@@ -1,4 +1,4 @@
-package org.organicdesign.fp.collections;
+package org.organicdesign.fp.collections.interfaces;
 
 import java.util.Iterator;
 

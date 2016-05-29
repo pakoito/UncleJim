@@ -16,6 +16,7 @@ package org.organicdesign.fp.collections;
 
 import org.junit.Test;
 import org.organicdesign.fp.FunctionUtils;
+import org.organicdesign.fp.collections.interfaces.UnmodList;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Arrays;
@@ -32,7 +33,7 @@ import static org.junit.Assert.*;
 public class UnmodListTest {
     @Test public void permutationsTest() {
         Set<Tuple2<Integer,Integer>> answerSet = new HashSet<>();
-        UnmodList.permutations(Arrays.asList(1,2,3,4),
+        UnmodList.Helpers.permutations(Arrays.asList(1,2,3,4),
                                (a, b) -> {
                                    answerSet.add(Tuple2.of(a, b));
                                    return answerSet;

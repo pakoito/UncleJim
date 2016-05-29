@@ -14,16 +14,16 @@
 
 package org.organicdesign.fp;
 
-import org.organicdesign.fp.collections.UnmodCollection;
-import org.organicdesign.fp.collections.UnmodIterable;
-import org.organicdesign.fp.collections.UnmodIterator;
-import org.organicdesign.fp.collections.UnmodList;
-import org.organicdesign.fp.collections.UnmodListIterator;
-import org.organicdesign.fp.collections.UnmodMap;
-import org.organicdesign.fp.collections.UnmodSet;
-import org.organicdesign.fp.collections.UnmodSortedIterator;
-import org.organicdesign.fp.collections.UnmodSortedMap;
-import org.organicdesign.fp.collections.UnmodSortedSet;
+import org.organicdesign.fp.collections.interfaces.UnmodCollection;
+import org.organicdesign.fp.collections.interfaces.UnmodIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodList;
+import org.organicdesign.fp.collections.interfaces.UnmodListIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodMap;
+import org.organicdesign.fp.collections.interfaces.UnmodSet;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedIterator;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedMap;
+import org.organicdesign.fp.collections.interfaces.UnmodSortedSet;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Collection;

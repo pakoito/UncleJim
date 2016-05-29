@@ -15,7 +15,7 @@
 package org.organicdesign.fp.function;
 
 import org.organicdesign.fp.Option;
-import org.organicdesign.fp.collections.UnmodIterable;
+import org.organicdesign.fp.collections.interfaces.UnmodIterable;
 import org.organicdesign.fp.xform.Transformable;
 import org.organicdesign.fp.xform.Xform;
 import rx.functions.Func1;
