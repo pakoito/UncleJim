@@ -231,7 +231,7 @@ public interface UnmodList<E> extends List<E>, UnmodSortedCollection<E> {
 //default Spliterator<E> spliterator()
 
     /** {@inheritDoc} */
-    @Override default UnmodList<E> subList(int fromIndex, int toIndex) {
+    @Override default UnmodList<E> subList(final int fromIndex, final int toIndex) {
         if ( (fromIndex == 0) && (toIndex == size()) ) {
             return this;
         }

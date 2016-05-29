@@ -18,27 +18,50 @@ public interface UnmodSortedIterable<T> extends UnmodIterable<T> {
             // No instances
         }
 
-        public static UnmodSortedIterable castFromSortedSet(SortedSet ss) {
-            return () -> new UnmodSortedIterator() {
-                Iterator iter = ss.iterator();
-                @Override public boolean hasNext() { return iter.hasNext(); }
-                @Override public Object next() { return iter.next(); }
+        public static UnmodSortedIterable castFromSortedSet(final SortedSet ss) {
+            return new UnmodSortedIterable() {
+                @Override
+                public UnmodSortedIterator iterator() {
+                    return new UnmodSortedIterator() {
+                        Iterator iter = ss.iterator();
+                        @Override public boolean hasNext() { return iter.hasNext(); }
+                        @Override public Object next() { return iter.next(); }
+                    };
+                }
             };
         }
 
-        public static UnmodSortedIterable castFromList(List ss) {
-            return () -> new UnmodSortedIterator() {
-                Iterator iter = ss.iterator();
-                @Override public boolean hasNext() { return iter.hasNext(); }
-                @Override public Object next() { return iter.next(); }
+        public static UnmodSortedIterable castFromList(final List ss) {
+            return new UnmodSortedIterable() {
+                @Override
+                public UnmodSortedIterator iterator() {
+                    return new UnmodSortedIterator() {
+                        Iterator iter = ss.iterator();
+                        @Override public boolean hasNext() { return iter.hasNext(); }
+                        @Override public Object next() { return iter.next(); }
+                    };
+                }
             };
         }
 
         public static UnmodSortedIterable castFromSortedMap(final SortedMap sm) {
-            return () -> new UnmodSortedIterator() {
-                Iterator iter = sm.entrySet().iterator();
-                @Override public boolean hasNext() { return iter.hasNext(); }
-                @Override public Object next() { return iter.next(); }
+            return new UnmodSortedIterable() {
+                @Override
+                public UnmodSortedIterator iterator() {
+                    return new UnmodSortedIterator() {
+                        Iterator iter = sm.entrySet().iterator();
+
+                        @Override
+                        public boolean hasNext() {
+                            return iter.hasNext();
+                        }
+
+                        @Override
+                        public Object next() {
+                            return iter.next();
+                        }
+                    };
+                }
             };
         }
 

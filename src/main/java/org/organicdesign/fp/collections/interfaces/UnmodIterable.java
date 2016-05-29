@@ -197,7 +197,7 @@ public interface UnmodIterable<T> extends Iterable<T>, Transformable<T> {
     default Option<T> head() {
         Iterator<T> iter = iterator();
         return iter.hasNext() ? Option.of(iter.next())
-                              : Option.none();
+                              : Option.<T>none();
     }
 
 //    /**

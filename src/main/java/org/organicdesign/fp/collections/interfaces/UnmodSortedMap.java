@@ -14,6 +14,7 @@
 package org.organicdesign.fp.collections.interfaces;
 
 import org.organicdesign.fp.collections.Equator;
+import org.organicdesign.fp.function.Function1;
 import org.organicdesign.fp.tuple.Tuple2;
 
 import java.util.Comparator;
@@ -60,9 +61,14 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
             @SuppressWarnings("unchecked")
             @Override public Comparator<Entry<K,V>> comparator() {
                 if (parentMap.comparator() == null) {
-                    return (a, b) -> Equator.ComparisonContext.DEFAULT_COMPARATOR
-                                                        .compare((Comparable) a.getKey(),
-                                                                 (Comparable) b.getKey());
+                    return new Comparator<Entry<K, V>>() {
+                        @Override
+                        public int compare(Entry<K, V> a, Entry<K, V> b) {
+                            return Equator.ComparisonContext.DEFAULT_COMPARATOR
+                                    .compare((Comparable) a.getKey(),
+                                            (Comparable) b.getKey());
+                        }
+                    };
                     // This may be more flexible, but from what I can tell, nothing else in the
                     // chain is this flexible and it's just going to be unused code that can't be
                     // tested.  For an unsorted Map, this may be appropriate.
@@ -70,7 +76,12 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
 //                             (b == null) ? null : (Comparable) b.getKey());
 
                 }
-                return (o1, o2) -> parentMap.comparator().compare(o1.getKey(), o2.getKey());
+                return new Comparator<Entry<K, V>>() {
+                    @Override
+                    public int compare(Entry<K, V> o1, Entry<K, V> o2) {
+                        return parentMap.comparator().compare(o1.getKey(), o2.getKey());
+                    }
+                };
             }
 
             @Override public UnmodSortedSet<Entry<K,V>> subSet(Entry<K,V> fromElement,
@@ -152,7 +163,7 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
 
     /** Returns a view of the keys contained in this map. */
     @Override default UnmodSortedSet<K> keySet() {
-        UnmodSortedMap<K,V> parentMap = this;
+        final UnmodSortedMap<K,V> parentMap = this;
         return new UnmodSortedSet<K>() {
             @SuppressWarnings("SuspiciousMethodCalls")
             @Override public boolean contains(Object o) { return parentMap.containsKey(o); }
@@ -176,8 +187,10 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
             }
 
             @Override public Comparator<? super K> comparator() {
-                return (parentMap.comparator() == null) ? Equator.defaultComparator()
-                                                        : parentMap.comparator();
+                if (parentMap.comparator() == null) {
+                    return Equator.<K>defaultComparator();
+                }
+                else return parentMap.comparator();
             }
 
             @Override public K first() {
@@ -268,7 +281,12 @@ public interface UnmodSortedMap<K,V> extends UnmodMap<K,V>, SortedMap<K,V>, Unmo
      */
     @SuppressWarnings("deprecation")
     @Override default UnmodList<V> values() {
-        return map((UnEntry<K,V> entry) -> entry.getValue())
+        return map(new Function1<UnEntry<K,V>, V>() {
+            @Override
+            public V applyEx(UnEntry<K, V> entry) throws Exception {
+                return entry.getValue();
+            }
+        })
                 .toImList();
 //        UnmodSortedMap<K,V> parentMap = this;
 //        return new UnmodSortedCollection<V>() {
