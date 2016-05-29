@@ -277,7 +277,7 @@ public class PersistentVector<E> extends ImList<E> {
     }
 
     /** {@inheritDoc} */
-    @Override public UnmodListIterator<E> listIterator(int index) {
+    @Override public UnmodListIterator<E> listIterator(final int index) {
         return new UnmodListIterator<E>() {
             private int i = index;
             private int base = i - (i % MAX_NODE_LENGTH);
@@ -430,7 +430,7 @@ public class PersistentVector<E> extends ImList<E> {
         if ( !(other instanceof List) ) { return false; }
         List that = (List) other;
         return (this.size() == that.size()) &&
-                UnmodSortedIterable.Helpers.equals2(this, Helpers.castFromList(that));
+                UnmodSortedIterable.Helpers.equals2(this, UnmodSortedIterable.Helpers.castFromList(that));
     }
 
     @Override public String toString() {
