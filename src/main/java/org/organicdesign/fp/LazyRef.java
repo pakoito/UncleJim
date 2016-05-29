@@ -39,7 +39,7 @@ public class LazyRef<T> {
         // Have we produced our value yet?
         if (producer != null) {
             // produce our value.
-            value = producer.apply();
+            value = producer.call();
             // Delete the producer to 1. mark the work done and 2. free resources.
             producer = null;
         }
